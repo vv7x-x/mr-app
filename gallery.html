@@ -379,6 +379,7 @@
             top: 0;
             transform-style: preserve-3d;
             transition: opacity 0.5s;
+            will-change: transform;
         }
 
         .flip-card-inner {
@@ -833,21 +834,36 @@
         const carousel = document.getElementById('carousel');
         const cards = document.querySelectorAll('.flip-card');
         const dotsBox = document.getElementById('dots');
-        const RADIUS = 480;
+        let RADIUS = 480;
         const angleStep = 360 / cards.length;
         let rotation = 0, isDragging = false, startX, startRot, hasDragged = false;
 
+        function updateRadius() {
+            // Smart Radius Calculation for small screens
+            const screenW = window.innerWidth;
+            if (screenW < 400) RADIUS = 320;
+            else if (screenW < 600) RADIUS = 380;
+            else if (screenW < 1000) RADIUS = 440;
+            else RADIUS = 480;
+
+            cards.forEach((card, i) => {
+                gsap.set(card, {
+                    rotationY: i * angleStep,
+                    transformOrigin: `50% 50% -${RADIUS}px`,
+                    z: RADIUS
+                });
+            });
+            gsap.set(carousel, { transformOrigin: `50% 50% -${RADIUS}px` });
+        }
+
         // Init cards
         cards.forEach((card, i) => {
-            gsap.set(card, {
-                rotationY: i * angleStep,
-                transformOrigin: `50% 50% -${RADIUS}px`,
-                z: RADIUS
-            });
             const d = document.createElement('div');
             d.className = 'dot' + (i === 0 ? ' active' : '');
             dotsBox.appendChild(d);
         });
+        updateRadius();
+        window.addEventListener('resize', updateRadius);
 
         function updateUI() {
             const index = (Math.round(-rotation / angleStep) % cards.length + cards.length) % cards.length;
@@ -877,7 +893,7 @@
         window.addEventListener('mouseup', onEnd);
         window.addEventListener('touchstart', e => onStart(e.touches[0].pageX), { passive: true });
         window.addEventListener('touchmove', e => onMove(e.touches[0].pageX), { passive: true });
-        window.addEventListener('touchend', onEnd);
+        window.addEventListener('touchend', onEnd, { passive: true });
 
         function navCarousel(dir) {
             rotation += dir * angleStep;
@@ -943,6 +959,11 @@
 
         function toggleScroll() {
             if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            if (audio.paused) {
+                audio.play().then(() => {
+                    document.getElementById('a-icon').innerText = 'music_note';
+                }).catch(() => {});
+            }
 
             const overlay = document.getElementById('scroll-overlay');
             const textEl = document.getElementById('scroll-text');
@@ -958,14 +979,13 @@
                 overlay.style.opacity = '1';
                 gsap.to("#scroll-anim", { scaleY: 1, duration: 1.5, ease: "expo.out" });
                 
-                // Cinematic Staggered Reveal
+                // Cinematic Staggered Reveal (Optimized)
                 gsap.to("#scroll-text span", { 
                     opacity: 1, 
                     y: 0, 
-                    filter: "blur(0px)",
                     duration: 0.8, 
-                    stagger: 0.08,
-                    delay: 1,
+                    stagger: 0.05,
+                    delay: 0.5,
                     ease: "power2.out",
                     onComplete: () => twemoji.parse(textEl)
                 });
@@ -1007,6 +1027,15 @@
         function handleFirstInteraction() {
             initVisualizer();
             if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            
+            // Critical Fix: Explicitly play if paused (handles user first interaction properly)
+            const music = document.getElementById('bg-music');
+            if (music && music.paused) {
+                music.play().then(() => {
+                    document.getElementById('a-icon').innerText = 'music_note';
+                }).catch(e => console.log("Play failed: ", e));
+            }
+
             window.removeEventListener('click', handleFirstInteraction);
             window.removeEventListener('touchstart', handleFirstInteraction);
         }

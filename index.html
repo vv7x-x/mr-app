@@ -123,7 +123,8 @@
             /* Complex Pattern Mask */
             mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><path d="M20 0 L40 20 L20 40 L0 20 Z" fill="black"/></svg>');
             mask-size: 25px 25px;
-            animation: spin 50s infinite linear;
+            animation: spin 60s infinite linear;
+            will-change: transform;
         }
         .frame {
             position: relative;
@@ -404,9 +405,9 @@
             });
             
             gsap.to("#gui", {
-                scale: 1.1,
+                scale: 0.9,
                 opacity: 0,
-                duration: 1,
+                duration: 0.8,
                 ease: "power2.in"
             });
         });
