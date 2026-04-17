@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" name="viewport" />
+    <title>Mariam's Room ✦</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌹</text></svg>">
+    <meta name="theme-color" content="#1c0512">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://unpkg.com/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
+    <style>
+        img.emoji { 
+            height: 1.25em; width: 1.25em; margin: 0 .1em; vertical-align: -0.2em;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            image-rendering: -webkit-optimize-contrast;
+        }
+        :root {
+            --bg: #16030a;
+            --surface: rgba(255, 255, 255, 0.03);
+            --text: #fff;
+            --muted: rgba(255, 220, 230, 0.8);
+            --pink: #ec4899;
+            --pink-light: #fce7f3;
+            --pink-dim: rgba(236, 72, 153, 0.25);
+            --gold: #d4a851;
+            --gold-light: #f8e4b8;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --radius: 480px;
+            /* Carousel Radius */
+            --card-w: 300px;
+            --card-h: 460px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            background: var(--bg);
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--text);
+            position: relative;
+        }
+
+        /* --- High-End Background Layers --- */
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .aurora {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .aurora-layer {
+            position: absolute;
+            border-radius: 50%;
+            will-change: transform;
+            filter: blur(80px);
+            animation: drift 30s ease-in-out infinite alternate;
+        }
+
+        .a1 {
+            width: 100vw;
+            height: 80vh;
+            background: radial-gradient(circle, rgba(131, 24, 67, 0.4) 0%, transparent 70%);
+            top: -20%;
+            left: -20%;
+        }
+
+        .a2 {
+            width: 80vw;
+            height: 100vh;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, transparent 70%);
+            bottom: -20%;
+            right: -20%;
+            animation-duration: 25s;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(8vw, 5vh) scale(1.15);
+            }
+        }
+
+        canvas#petals {
+            position: fixed;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* --- Header --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: calc(1rem + env(safe-area-inset-top)) 2rem 1rem;
+            background: linear-gradient(180deg, rgba(22, 3, 10, 0.8) 0%, transparent 100%);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.4rem;
+            color: var(--pink-light);
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .logo span {
+            font-size: 1.2rem;
+            color: var(--pink);
+            animation: breathe 2.5s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: scale(0.9);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        .header-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            text-decoration: none;
+        }
+
+        .header-btn:hover {
+            background: var(--pink);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(236, 72, 153, 0.3);
+        }
+
+        /* --- Layout: Page Scroll --- */
+        .page-scroll {
+            width: 100%;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+            padding-top: 80px;
+            overflow: hidden;
+        }
+
+        /* --- Egyptian Toast Notifications --- */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 350px;
+        }
+
+        .egy-toast {
+            background: rgba(49, 6, 25, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            border-radius: 100px;
+            padding: 0.8rem 1.8rem;
+            color: #fff;
+            font-family: 'Amiri', serif;
+            font-size: 1.1rem;
+            text-align: center;
+            direction: rtl;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: toastEnter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.2) forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .egy-toast::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transform: translateX(-100%);
+            animation: toastShimmer 3s infinite;
+        }
+
+        @keyframes toastEnter {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes toastExit {
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.9);
+            }
+        }
+
+        @keyframes toastShimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* --- Papyrus Scroll Styles --- */
+        #scroll-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 5000;
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px);
+            opacity: 0; transition: opacity 0.5s;
+        }
+        .scroll-container {
+            width: 90%; max-width: 500px; position: relative;
+            transform-origin: center top; transform: scaleY(0);
+        }
+        .papyrus {
+            background: #f4e4bc; background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+            border-left: 15px solid #d4a851; border-right: 15px solid #d4a851;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.1);
+            padding: 3rem 2rem; border-radius: 5px; position: relative;
+            min-height: 400px; display: flex; flex-direction: column; align-items: center;
+        }
+        .papyrus::before, .papyrus::after {
+            content: ''; position: absolute; left: -25px; right: -25px; height: 30px;
+            background: #c6a664; border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .papyrus::before { top: -15px; }
+        .papyrus::after { bottom: -15px; }
+        
+        .scroll-text {
+            font-family: 'Amiri', serif; font-size: 1.5rem; line-height: 1.8; color: #3d2b1f;
+            text-align: center; direction: rtl; opacity: 1; /* Managed via spans in JS */
+            width: 100%;
+        }
+        .scroll-text span { display: inline-block; opacity: 0; transform: translateY(10px); filter: blur(5px); }
+        .scroll-close {
+            margin-top: 2rem; padding: 0.6rem 2rem; border: 1px solid #3d2b1f;
+            background: transparent; font-family: 'Amiri', serif; cursor: pointer;
+            border-radius: 50px; color: #3d2b1f; transition: 0.3s;
+        }
+        .scroll-close:hover { background: #3d2b1f; color: #f4e4bc; }
+
+        /* --- Witty Intro --- */
+        .hero-hint {
+            margin-bottom: 2rem;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInDown 1s ease-out 0.8s forwards;
+        }
+
+        .hero-hint p {
+            font-family: 'Aref Ruqaa', serif;
+            font-size: 1.1rem;
+            color: var(--pink-light);
+            background: rgba(236, 72, 153, 0.1);
+            padding: .7rem 2.5rem;
+            border-radius: 100px;
+            border: 1px solid rgba(236, 72, 153, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- 3D Carousel Engine --- */
+        .scene {
+            width: var(--card-w);
+            height: var(--card-h);
+            perspective: 2000px;
+            position: relative;
+            cursor: grab;
+            transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            will-change: transform;
+            transform: scale(var(--s, 1));
+        }
+
+        .scene:active {
+            cursor: grabbing;
+        }
+
+        /* Auto-scaling carousel */
+        @media (max-width: 1024px) {
+            .scene {
+                --s: 0.85;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .scene {
+                --s: 0.75;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .scene {
+                --s: 0.65;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .scene {
+                --s: 0.55;
+            }
+        }
+
+        .carousel {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            transform: translateZ(calc(var(--radius) * -1)) rotateY(0deg);
+            will-change: transform;
+        }
+
+        .flip-card {
+            position: absolute;
+            width: var(--card-w);
+            height: var(--card-h);
+            left: 0;
+            top: 0;
+            transform-style: preserve-3d;
+            transition: opacity 0.5s;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 2.2rem;
+            backface-visibility: hidden;
+            overflow: hidden;
+            padding: 1.2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Front Face: Modern Glassmorphism */
+        .card-front {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(236, 72, 153, 0.15));
+            backdrop-filter: blur(25px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .photo-wrap {
+            flex: 1;
+            border-radius: 1.8rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .photo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .flip-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .card-title {
+            font-family: 'Aref Ruqaa', serif;
+            font-size: 1.6rem;
+            color: var(--pink-light);
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            justify-content: center;
+        }
+
+        .card-title span {
+            color: var(--pink);
+            font-size: 1.3rem;
+        }
+
+        .card-hint {
+            font-family: 'Amiri', serif;
+            font-size: 0.95rem;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 0.3rem;
+        }
+
+        /* Back Face: Deep Romantic Rose */
+        .card-back {
+            background: linear-gradient(135deg, #310619, #16030a);
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .card-back::after {
+            content: '';
+            position: absolute;
+            inset: 15px;
+            border: 1px solid rgba(236, 72, 153, 0.15);
+            border-radius: 1.8rem;
+            pointer-events: none;
+        }
+
+        .back-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--pink);
+            margin-bottom: 1.2rem;
+            font-style: italic;
+        }
+
+        .back-poem {
+            font-family: 'Amiri', serif;
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: var(--text);
+            direction: rtl;
+        }
+
+        /* --- Controls & UI --- */
+        .controls {
+            display: flex;
+            gap: 4rem;
+            margin-top: 2.5rem;
+            z-index: 50;
+        }
+
+        .ctrl-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .ctrl-btn:hover {
+            background: var(--pink);
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(236, 72, 153, 0.4);
+        }
+
+        .dots {
+            display: flex;
+            gap: .8rem;
+            margin-top: 2rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(236, 72, 153, 0.25);
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .dot.active {
+            background: var(--pink);
+            width: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px var(--pink);
+        }
+
+        /* --- Lightbox --- */
+        #lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        #lightbox.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        #lb-img {
+            max-width: 90%;
+            max-height: 85%;
+            border-radius: 0.5rem;
+            box-shadow: 0 0 100px rgba(236, 72, 153, 0.2);
+        }
+
+        .lb-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: #fff;
+            font-size: 2.5rem;
+            cursor: pointer;
+        }
+
+        /* --- Page Entrance Portal --- */
+        #portal-reveal {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            z-index: 9999;
+            pointer-events: none;
+            clip-path: circle(150% at 50% 50%);
+        }
+
+        @keyframes fadeInDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .controls {
+                gap: 2rem;
+            }
+
+            .hero-hint p {
+                font-size: 0.95rem;
+                padding: .6rem 1.8rem;
+            }
+
+            header {
+                padding: 1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="portal-reveal"></div>
+
+    <audio id="bg-music" loop preload="auto">
+        <source src="02_-_Waadtak.mp3" type="audio/mpeg">
+    </audio>
+
+    <canvas id="bg-canvas"></canvas>
+    <div class="aurora">
+        <div class="aurora-layer a1"></div>
+        <div class="aurora-layer a2"></div>
+    </div>
+    <canvas id="petals"></canvas>
+
+    <header>
+        <div class="logo">Mariam's World <span class="material-symbols-outlined">favorite</span></div>
+        <div style="display:flex; gap: 0.8rem;">
+            <button class="header-btn" onclick="toggleScroll()" title="رسالة خاصة"><span class="material-symbols-outlined">drafts</span></button>
+            <button class="header-btn" onclick="toggleAudio()"><span class="material-symbols-outlined"
+                    id="a-icon">music_off</span></button>
+            <a href="index.html" class="header-btn"><span class="material-symbols-outlined">home</span></a>
+        </div>
+    </header>
+
+    <div class="page-scroll">
+        <div class="hero-hint">
+            <p>اسحبي بأصبعك كدا.. وريني الشطارة 😉 ✨</p>
+        </div>
+
+        <div class="scene" id="scene">
+            <div class="carousel" id="carousel">
+                <div class="flip-card" onclick="handleCardClick(this)">
+                    <div class="flip-card-inner">
+                        <div class="face card-front">
+                            <div class="photo-wrap"><img src="p1.jpg" alt="P1"
+                                    onerror="this.src='https://picsum.photos/400/600?rose=1'"></div>
+                            <p class="card-title">حكاية وردة <span>✿</span></p>
+                            <p class="card-hint">انقري عشان الدلع 😉</p>
+                        </div>
+                        <div class="face card-back">
+                            <p class="back-title">لغة العيون</p>
+                            <p class="back-poem">" في عيونك ألف معنى وقصيدة، وفي ضحكتك حياة تانية جديدة.. "</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card" onclick="handleCardClick(this)">
+                    <div class="flip-card-inner">
+                        <div class="face card-front">
+                            <div class="photo-wrap"><img src="p2.jpg" alt="P2"
+                                    onerror="this.src='https://picsum.photos/400/600?rose=2'"></div>
+                            <p class="card-title">سحر الليل <span>★</span></p>
+                            <p class="card-hint">في صورة كدة ليكي.. قمر 😉</p>
+                        </div>
+                        <div class="face card-back">
+                            <p class="back-title">سهر الليالي</p>
+                            <p class="back-poem">" كأنك قمر في وسط العتمة بيبان، والكون كله قصاد جمالك هيمان.. "</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card" onclick="handleCardClick(this)">
+                    <div class="flip-card-inner">
+                        <div class="face card-front">
+                            <div class="photo-wrap"><img src="p3.jpg" alt="P3"
+                                    onerror="this.src='https://picsum.photos/400/600?rose=3'"></div>
+                            <p class="card-title">همس الروح <span>❤</span></p>
+                            <p class="card-hint">انقري وادعيلي 😉</p>
+                        </div>
+                        <div class="face card-back">
+                            <p class="back-title">نبض القلب</p>
+                            <p class="back-poem">" يا اللي حضورك بيحلّي أي مكان، دايماً جوه القلب ليكي كيان.. "</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card" onclick="handleCardClick(this)">
+                    <div class="flip-card-inner">
+                        <div class="face card-front">
+                            <div class="photo-wrap"><img src="p4.jpg" alt="P4"
+                                    onerror="this.src='https://picsum.photos/400/600?rose=4'"></div>
+                            <p class="card-title">أجمل صدفة <span>✧</span></p>
+                            <p class="card-hint">الورد يغير منك 😉</p>
+                        </div>
+                        <div class="face card-back">
+                            <p class="back-title">صدفة جميلة</p>
+                            <p class="back-poem">" مكنتش أعرف إن الصدفة ممكن تكون بالجمال ده كله.. "</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card" onclick="handleCardClick(this)">
+                    <div class="flip-card-inner">
+                        <div class="face card-front">
+                            <div class="photo-wrap"><img src="p5.jpg" alt="P5"
+                                    onerror="this.src='https://picsum.photos/400/600?rose=5'"></div>
+                            <p class="card-title">نور الضحكة <span>☀</span></p>
+                            <p class="card-hint">ضحكتك بالدنيا 😉</p>
+                        </div>
+                        <div class="face card-back">
+                            <p class="back-title">نور الدنيا</p>
+                            <p class="back-poem">" خلي دايماً الضحكة مرسومة، إنتي في الجمال بجد حكومة.. "</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-card" onclick="handleCardClick(this)">
+                    <div class="flip-card-inner">
+                        <div class="face card-front">
+                            <div class="photo-wrap"><img src="p6.jpg" alt="P6"
+                                    onerror="this.src='https://picsum.photos/400/600?rose=6'"></div>
+                            <p class="card-title">دلع مصري <span>⚓</span></p>
+                            <p class="card-hint">آخر جمال 😉</p>
+                        </div>
+                        <div class="face card-back">
+                            <p class="back-title">أصل الدلع</p>
+                            <p class="back-poem">" الدلع ليكي لوحده، والجمال مالوش زيّك حد.. "</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dots" id="dots"></div>
+
+        <div class="controls">
+            <button class="ctrl-btn" onclick="navCarousel(1)"><span class="material-symbols-outlined"
+                    style="transform:scaleX(-1)">arrow_forward</span></button>
+            <button class="ctrl-btn" onclick="navCarousel(-1)"><span
+                    class="material-symbols-outlined">arrow_forward</span></button>
+        </div>
+    </div>
+
+    <div id="lightbox" onclick="closeLB()"><span class="lb-close">✕</span><img id="lb-img" src=""></div>
+    <div class="toast-container" id="toast-container"></div>
+    
+    <div id="scroll-overlay" onclick="closeScroll()">
+        <div class="scroll-container" id="scroll-anim">
+            <div class="papyrus" onclick="event.stopPropagation()">
+                <div class="scroll-text" id="scroll-text">
+                    مريم.. في ناس حضورها بيطغي على المكان، وإنتي حضورك بيضيف للمكان روح ورُقيّ. ذوقك وتعاملك المحترم مع الناس بجد حاجة تدرّس، وإنتِ مثال للشخصية اللي بتجبر الكل إنه يقدرها ويقدر مسافتها وجمالها الهادي. بجد إنتِ إضافة لأي مكان بتدخلي فيه، وتفضلي دايماً متألقة بنجاحك ونضجك اللي ملّوش زي. تفضلي دايماً يا ست الكل في أحسن حال. ✨📜✨
+                </div>
+                <button class="scroll-close" onclick="closeScroll()">إغلاق البردية</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        // --- 1. Background Particles Engine ---
+        const bC = document.getElementById('bg-canvas'), bX = bC.getContext('2d');
+        const pC = document.getElementById('petals'), pX = pC.getContext('2d');
+        let stars = [], petals = [], w, h;
+        let audioCtx, analyser, dataArray;
+
+        function initVisualizer() {
+            if (audioCtx) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioCtx.createMediaElementSource(document.getElementById('bg-music'));
+            analyser = audioCtx.createAnalyser();
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+            analyser.fftSize = 256;
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+        }
+
+        function resize() {
+            w = bC.width = pC.width = window.innerWidth;
+            h = bC.height = pC.height = window.innerHeight;
+            stars = Array.from({ length: 80 }, () => ({
+                x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.5,
+                o: Math.random(), s: 0.01 + Math.random() * 0.02
+            }));
+        }
+
+        function createPetal() {
+            return {
+                x: Math.random() * w, y: -20, sz: 3 + Math.random() * 6,
+                sp: 0.8 + Math.random() * 1.5, dr: (Math.random() - 0.5) * 0.8,
+                ro: Math.random() * Math.PI, rs: 0.02 + Math.random() * 0.03
+            };
+        }
+
+        petals = Array.from({ length: 25 }, createPetal);
+        resize(); window.addEventListener('resize', resize);
+
+        function animate() {
+            bX.clearRect(0, 0, w, h); pX.clearRect(0, 0, w, h);
+
+            let bass = 0;
+            if (analyser) {
+                analyser.getByteFrequencyData(dataArray);
+                bass = dataArray[2] / 255;
+            }
+
+            // Stars loop
+            bX.fillStyle = "#fff";
+            stars.forEach(s => {
+                s.o += s.s + (bass * 0.05);
+                bX.globalAlpha = 0.2 + (Math.abs(Math.sin(s.o)) * 0.7);
+                bX.beginPath(); bX.arc(s.x, s.y, s.r, 0, Math.PI * 2); bX.fill();
+            });
+
+            // Petals loop
+            pX.fillStyle = "#f9a8d4";
+            petals.forEach((p, i) => {
+                p.y += p.sp + (bass * 2); p.x += p.dr; p.ro += p.rs;
+                if (p.y > h + 20) petals[i] = createPetal();
+                pX.save(); pX.translate(p.x, p.y); pX.rotate(p.ro); pX.globalAlpha = 0.5;
+                pX.beginPath(); pX.ellipse(0, 0, p.sz, p.sz * 1.4, 0, 0, Math.PI * 2); pX.fill();
+                pX.restore();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- 2. 3D Carousel Logic (Optimized for Mobile/APK) ---
+        const carousel = document.getElementById('carousel');
+        const cards = document.querySelectorAll('.flip-card');
+        const dotsBox = document.getElementById('dots');
+        const RADIUS = 480;
+        const angleStep = 360 / cards.length;
+        let rotation = 0, isDragging = false, startX, startRot, hasDragged = false;
+
+        // Init cards
+        cards.forEach((card, i) => {
+            gsap.set(card, {
+                rotationY: i * angleStep,
+                transformOrigin: `50% 50% -${RADIUS}px`,
+                z: RADIUS
+            });
+            const d = document.createElement('div');
+            d.className = 'dot' + (i === 0 ? ' active' : '');
+            dotsBox.appendChild(d);
+        });
+
+        function updateUI() {
+            const index = (Math.round(-rotation / angleStep) % cards.length + cards.length) % cards.length;
+            document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
+        }
+
+        // Drag handlers
+        const onStart = (x) => { isDragging = true; startX = x; startRot = rotation; hasDragged = false; };
+        const onMove = (x) => {
+            if (!isDragging) return;
+            const delta = x - startX;
+            if (Math.abs(delta) > 5) hasDragged = true;
+            rotation = startRot + (delta * 0.2);
+            gsap.set(carousel, { rotationY: rotation });
+        };
+        const onEnd = () => {
+            if (!isDragging) return; isDragging = false;
+            // Snap to nearest card
+            const oldRot = Math.round(startRot / angleStep) * angleStep;
+            rotation = Math.round(rotation / angleStep) * angleStep;
+            gsap.to(carousel, { rotationY: rotation, duration: 0.8, ease: "power2.out", onUpdate: updateUI });
+            if (rotation !== oldRot) showEgyptianCheer(true);
+        };
+
+        window.addEventListener('mousedown', e => onStart(e.pageX));
+        window.addEventListener('mousemove', e => onMove(e.pageX));
+        window.addEventListener('mouseup', onEnd);
+        window.addEventListener('touchstart', e => onStart(e.touches[0].pageX), { passive: true });
+        window.addEventListener('touchmove', e => onMove(e.touches[0].pageX), { passive: true });
+        window.addEventListener('touchend', onEnd);
+
+        function navCarousel(dir) {
+            rotation += dir * angleStep;
+            gsap.to(carousel, { rotationY: rotation, duration: 0.8, ease: "power2.out", onUpdate: updateUI });
+            showEgyptianCheer(true);
+        }
+
+        // --- 3. Card Interactions ---
+        function handleCardClick(el) {
+            if (hasDragged) return;
+            el.classList.toggle('flipped');
+            if (el.classList.contains('flipped')) {
+                showEgyptianCheer(true);
+            }
+        }
+
+        // --- 4. Egyptian Toast Engine ---
+        const cheers = [
+            "الجمال ده محتاج ترخيص! 😉",
+            "ذوق ورُقيّ ملهوش زي! ✨",
+            "يا ست الكل، منورة الدنيا بطلتك! 🌟",
+            "شخصية تجبر الكل على احترامها.. 👏",
+            "إيه الشياكة دي؟ مفيّش كدة! ✨",
+            "قمر بصحيح.. الله أكبر عليكي! 🧿",
+            "المكان نور بوجودك يا مريم! ✦",
+            "ذوقك دايماً في حتة تانية خالص.. 🌟"
+        ];
+
+        function showEgyptianCheer(isTriggered = false) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'egy-toast';
+            toast.innerText = cheers[Math.floor(Math.random() * cheers.length)];
+
+            container.appendChild(toast);
+            twemoji.parse(toast, { folder: 'svg', ext: '.svg' }); 
+
+            setTimeout(() => {
+                toast.style.animation = 'toastExit 0.6s ease forwards';
+                setTimeout(() => toast.remove(), 600);
+            }, 3500);
+        }
+
+        // Ambient cheers
+        setInterval(() => {
+            if (Math.random() > 0.6) showEgyptianCheer();
+        }, 22000);
+
+        // --- 5. Utilities & Transitions ---
+        const audio = document.getElementById('bg-music');
+        function toggleAudio() {
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            
+            if (audio.paused) {
+                audio.play();
+                document.getElementById('a-icon').innerText = 'music_note';
+            } else {
+                audio.pause();
+                document.getElementById('a-icon').innerText = 'music_off';
+            }
+        }
+
+        function toggleScroll() {
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+
+            const overlay = document.getElementById('scroll-overlay');
+            const textEl = document.getElementById('scroll-text');
+            
+            // Wrap words in spans for animation if not already done
+            if (!textEl.innerHTML.includes('</span>')) {
+                const words = textEl.innerText.split(' ');
+                textEl.innerHTML = words.map(w => `<span>${w}</span>`).join(' ');
+            }
+
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+                gsap.to("#scroll-anim", { scaleY: 1, duration: 1.5, ease: "expo.out" });
+                
+                // Cinematic Staggered Reveal
+                gsap.to("#scroll-text span", { 
+                    opacity: 1, 
+                    y: 0, 
+                    filter: "blur(0px)",
+                    duration: 0.8, 
+                    stagger: 0.08,
+                    delay: 1,
+                    ease: "power2.out",
+                    onComplete: () => twemoji.parse(textEl)
+                });
+            }, 10);
+        }
+
+        function closeScroll() {
+            gsap.to("#scroll-text span", { opacity: 0, y: -10, duration: 0.4, stagger: 0.02 });
+            gsap.to("#scroll-anim", { scaleY: 0, duration: 0.8, ease: "power2.in" });
+            const overlay = document.getElementById('scroll-overlay');
+            gsap.to(overlay, { opacity: 0, duration: 0.5, delay: 0.4, onComplete: () => overlay.style.display = 'none' });
+        }
+
+        window.addEventListener('load', () => {
+             // Cinematic Entrance Reveal
+             gsap.to("#portal-reveal", { 
+                clipPath: "circle(0% at 50% 50%)", 
+                duration: 1.5, 
+                ease: "expo.inOut", 
+                delay: 0.3,
+                onComplete: () => {
+                    document.getElementById('portal-reveal').remove();
+                    twemoji.parse(document.body, { folder: 'svg', ext: '.svg' });
+                    // Attempt auto-play
+                    const audio = document.getElementById('bg-music');
+                    if (audio) {
+                        audio.play().then(() => {
+                            initVisualizer();
+                        }).catch(() => {
+                            console.log("Autoplay blocked, waiting for touch.");
+                        });
+                        document.getElementById('a-icon').innerText = 'music_note';
+                    }
+                }
+            });
+        });
+
+        // Global interaction listener to establish Audio Graph early
+        function handleFirstInteraction() {
+            initVisualizer();
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            window.removeEventListener('click', handleFirstInteraction);
+            window.removeEventListener('touchstart', handleFirstInteraction);
+        }
+        window.addEventListener('click', handleFirstInteraction);
+        window.addEventListener('touchstart', handleFirstInteraction);
+
+        // Double click/Long press for Lightbox
+        cards.forEach(card => {
+            card.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                openLB(card.querySelector('img').src);
+            });
+        });
+
+        function openLB(src) {
+            const lb = document.getElementById('lightbox');
+            document.getElementById('lb-img').src = src;
+            lb.style.display = 'flex';
+            setTimeout(() => lb.classList.add('visible'), 10);
+        }
+        function closeLB() {
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('visible');
+            setTimeout(() => lb.style.display = 'none', 400);
+        }
+    </script>
+</body>
+
+</html>

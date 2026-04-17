@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" name="viewport"/>
+    <title>Mariam's World ✦</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌹</text></svg>">
+    <meta name="theme-color" content="#1a030d">
+    
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Playfair+Display:ital,wght@0,700;1,700&family=Aref+Ruqaa:wght@400;700&family=Amiri:ital,wght@0,400;0,700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <!-- Animation Engine - Lightweight & Powerful -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        img.emoji { 
+            height: 1.25em; width: 1.25em; margin: 0 .1em; vertical-align: -0.2em;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            image-rendering: -webkit-optimize-contrast;
+        }
+        :root {
+            --bg: #1a030d; /* Deep Night Rose */
+            --accent: #ec4899; /* Pink Gold */
+            --gold: #d4a851; /* Egyptian Gold */
+            --gold-glow: rgba(212, 168, 81, 0.4);
+            --text: #fdf2f8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(236, 72, 153, 0.15);
+        }
+
+        /* Essential Reset for Mobile APK */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100dvh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1500px;
+            /* Safe Areas for Notch Phones */
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        /* --- ATMOSPHERIC CANVAS (Egypt Sand Dust) --- */
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* --- PRELOADER (The Witty Intro) --- */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s ease;
+        }
+        .loading-ornament {
+            width: 70px; height: 70px;
+            border: 2px solid var(--gold);
+            border-radius: 15% 45% 15% 45%;
+            animation: spin 4s infinite linear;
+            margin-bottom: 2rem;
+            position: relative;
+            box-shadow: 0 0 30px var(--gold-glow);
+        }
+        .loading-ornament::before {
+            content: ''; position: absolute; inset: 12px;
+            border: 1px dashed var(--accent); border-radius: inherit;
+            animation: spin 2s infinite linear reverse;
+        }
+        #preloader-msg {
+            font-family: 'Aref Ruqaa', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            text-align: center;
+            min-height: 2em;
+            transition: opacity 0.3s;
+        }
+
+        /* --- MAIN UI --- */
+        main {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0; /* Managed by GSAP */
+            transform: translateY(30px);
+        }
+
+        /* Portrait Mashrabiya Aura */
+        .portrait-wrap {
+            position: relative;
+            width: clamp(200px, 50vw, 290px);
+            aspect-ratio: 1/1;
+            margin-bottom: 2.5rem;
+        }
+        .mashrabiya-ring {
+            position: absolute;
+            inset: -25px;
+            border: 1px solid var(--gold-glow);
+            border-radius: 50%;
+            background: radial-gradient(circle, transparent 50%, rgba(212,168,81,0.08) 100%);
+            /* Complex Pattern Mask */
+            mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><path d="M20 0 L40 20 L20 40 L0 20 Z" fill="black"/></svg>');
+            mask-size: 25px 25px;
+            animation: spin 50s infinite linear;
+        }
+        .frame {
+            position: relative;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            padding: 5px;
+            background: var(--bg);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 20px var(--gold-glow);
+            overflow: hidden;
+            z-index: 5;
+        }
+        .frame img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            filter: contrast(1.05) saturate(1.1);
+        }
+
+        /* Playful Gems */
+        .p-gem {
+            position: absolute;
+            width: 44px; height: 44px;
+            background: rgba(26,3,13,0.8);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(8px);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--gold);
+            z-index: 6;
+            animation: float 6s infinite ease-in-out;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+        .gem-heart { top: 5%; right: -5%; animation-delay: 0s; color: var(--accent); }
+        .gem-star { bottom: 10%; left: -8%; animation-delay: -3s; }
+
+        /* Typography */
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 7vw, 3.8rem);
+            font-style: italic;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .name-highlight {
+            display: block;
+            font-family: 'Aref Ruqaa', serif;
+            background: linear-gradient(90deg, var(--gold), #fff, var(--gold));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 4s infinite linear;
+            font-style: normal;
+        }
+
+        .tagline {
+            font-family: 'Amiri', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 2.5rem;
+            opacity: 0.85;
+        }
+
+        /* The "Hezar" Button */
+        .action-btn {
+            position: relative;
+            padding: 1rem 3rem;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-blob {
+            position: absolute;
+            inset: 0;
+            background: var(--accent);
+            border-radius: 100px;
+            z-index: -1;
+            box-shadow: 0 12px 40px rgba(236,72,153,0.4);
+            transition: inherit;
+        }
+        .action-btn:hover { transform: scale(1.05); letter-spacing: 0.05em; }
+        .action-btn:hover .btn-blob { background: var(--gold); box-shadow: 0 15px 50px rgba(212,168,81,0.5); }
+        
+            color: rgba(255,190,200,0.4);
+            font-style: italic;
+        }
+
+        /* --- Egyptian Toast Notifications --- */
+        .toast-container {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 3000; display: flex; flex-direction: column; align-items: center;
+            gap: 10px; pointer-events: none; width: 90%; max-width: 350px;
+        }
+        .egy-toast {
+            background: rgba(49, 6, 25, 0.7); backdrop-filter: blur(15px);
+            border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 100px;
+            padding: 0.8rem 1.8rem; color: #fff; font-family: 'Amiri', serif;
+            font-size: 1.1rem; text-align: center; direction: rtl;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: toastEnter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.2) forwards;
+            position: relative; overflow: hidden;
+        }
+        .egy-toast::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: translateX(-100%); animation: toastShimmer 3s infinite;
+        }
+        @keyframes toastEnter {
+            from { opacity: 0; transform: translateY(40px) scale(0.8); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toastExit {
+            to { opacity: 0; transform: translateY(-20px) scale(0.9); }
+        }
+        @keyframes toastShimmer { 100% { transform: translateX(100%); } }
+
+        /* Transition Portal */
+        #portal {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            z-index: 99999;
+            pointer-events: none;
+            clip-path: circle(0% at 50% 50%);
+        }
+
+        /* Animations */
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes shimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(8deg); }
+        }
+
+        /* Responsiveness Fixes */
+        @media (max-height: 700px) {
+            .portrait-wrap { width: 180px; margin-bottom: 1.5rem; }
+            h1 { font-size: 2rem; }
+            .tagline { margin-bottom: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="portal"></div>
+
+    <audio id="bg-music" loop>
+        <source src="02_-_Waadtak.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- The Witty Intro -->
+    <div id="preloader">
+        <div class="loading-ornament"></div>
+        <p id="preloader-msg">بنفرش السجاد الأحمر.. ثواني!</p>
+    </div>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <main id="gui">
+        <div class="portrait-wrap">
+            <div class="mashrabiya-ring"></div>
+            <div class="frame">
+                <img src="p3.jpg" alt="Mariam" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop'">
+            </div>
+            <div class="p-gem gem-heart">
+                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">favorite</span>
+            </div>
+            <div class="p-gem gem-star">
+                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+            </div>
+        </div>
+
+        <h1>
+            خِطوة عزيزة،
+            <span class="name-highlight">يا ست الكل</span>
+        </h1>
+        <p class="tagline">عالمِك الخاص مِستنيكي بصبر.. 🌹</p>
+
+        <a href="gallery.html" class="action-btn" id="start-btn">
+            <div class="btn-blob"></div>
+            <span style="position:relative; display:flex; align-items:center; gap:0.6rem;">
+                نُخش في الدلع؟
+                <span class="material-symbols-outlined">rocket_launch</span>
+            </span>
+        </a>
+
+        <p class="witty-hint">ممنوع دخول العزاب ✋✨</p>
+    </main>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // --- ADAPTIVE EGYPTIAN DUST CANVAS ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let dots = [];
+        
+        function setupCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            dots = [];
+            const density = window.innerWidth < 600 ? 50 : 120;
+            for(let i=0; i<density; i++) {
+                dots.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 2 + 0.3,
+                    sy: Math.random() * 0.4 + 0.1,
+                    sx: (Math.random() - 0.5) * 0.2,
+                    o: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            ctx.fillStyle = "#d4a851"; 
+            dots.forEach(d => {
+                ctx.globalAlpha = d.o;
+                ctx.beginPath();
+                ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
+                ctx.fill();
+                d.y -= d.sy; d.x += d.sx;
+                if(d.y < -5) { d.y = canvas.height + 5; d.x = Math.random() * canvas.width; }
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+
+        setupCanvas(); animateCanvas();
+        window.addEventListener('resize', setupCanvas);
+
+        // --- ENTRANCE ORCHESTRATION ---
+        window.addEventListener('load', () => {
+            const msgEl = document.getElementById('preloader-msg');
+            const jokes = ["جاري تظبيط القعدة..", "ثواني والقهوة تجهز..", "منورة الكون والله!", "بنجهّز الدلع.."];
+            let step = 0;
+            const jokeTimer = setInterval(() => {
+                msgEl.style.opacity = 0;
+                setTimeout(() => {
+                    msgEl.innerText = jokes[++step % jokes.length];
+                    msgEl.style.opacity = 1;
+                }, 300);
+            }, 1600);
+
+            // Trigger Entrance
+            setTimeout(() => {
+                clearInterval(jokeTimer);
+                const tl = gsap.timeline();
+                tl.to("#preloader", { opacity: 0, duration: 0.8, onComplete: () => document.getElementById('preloader').remove() })
+                  .to("#gui", { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" })
+                  .from(".portrait-wrap", { scale: 0.7, rotation: 5, duration: 1.5, ease: "back.out(1.5)" }, "-=1")
+                  .from(".p-gem", { scale: 0, stagger: 0.2, duration: 0.8, ease: "back.out(2)" }, "-=0.5");
+            }, 3000); // 3s for that premium "feel"
+        });
+
+        // --- PORTAL EXIT ---
+        const startBtn = document.getElementById('start-btn');
+        startBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = startBtn.getAttribute('href');
+            
+            // Interaction Feedback
+            startBtn.innerHTML = "<div class='btn-blob'></div><span>ثواني يا جميل.. 🚀</span>";
+            
+            gsap.to("#portal", {
+                clipPath: "circle(150% at 50% 50%)",
+                duration: 1.4,
+                ease: "expo.inOut",
+                onComplete: () => window.location.href = url
+            });
+            
+            gsap.to("#gui", {
+                scale: 1.1,
+                opacity: 0,
+                duration: 1,
+                ease: "power2.in"
+            });
+        });
+
+        // --- AUDIO AUTO-PLAY LOGIC ---
+        const audio = document.getElementById('bg-music');
+        function startMusic() {
+            if (audio.paused) {
+                audio.play().catch(() => {});
+                document.removeEventListener('click', startMusic);
+                document.removeEventListener('touchstart', startMusic);
+            }
+        }
+        document.addEventListener('click', startMusic);
+        document.addEventListener('touchstart', startMusic);
+
+        // --- EGYPTIAN TOAST ENGINE ---
+        const cheers = [
+            "الجمال ده محتاج ترخيص! 😉",
+            "يا أرض اتهدي ما عليكي قدي.. 🌹",
+            "إيه الحلاوة دي؟ مريم مفيش منها اتنين! ✨",
+            "ضحكتك دي كفيلة تخلي اليوم عسل.. ❤️",
+            "يا ست الكل، الدلع ده كتير علينا! 🥰",
+            "عينيكي فيها سحر يخطف القلب.. 🧿",
+            "إيه الشياكة دي؟ مريم مفيش منها اتنين! ✦",
+            "يا واش يا واش.. الجمال هبّاش! 😉",
+            "قمر بصحيح.. الله أكبر عليكي! 🧿",
+            "منورة الدنيا كلها يا مريم! ✨"
+        ];
+
+        function showEgyptianCheer() {
+            const container = document.getElementById('toast-container');
+            if(!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'egy-toast';
+            toast.innerText = cheers[Math.floor(Math.random() * cheers.length)];
+            container.appendChild(toast);
+            twemoji.parse(toast, { folder: 'svg', ext: '.svg' }); 
+            setTimeout(() => {
+                toast.style.animation = 'toastExit 0.6s ease forwards';
+                setTimeout(() => toast.remove(), 600);
+            }, 3500);
+        }
+
+        // Random Compliments
+        setInterval(() => {
+            if(Math.random() > 0.7) showEgyptianCheer();
+        }, 15000);
+
+        window.addEventListener('load', () => {
+            twemoji.parse(document.body, { folder: 'svg', ext: '.svg' });
+        });
+    </script>
+</body>
+</html>
