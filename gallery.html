@@ -1,468 +1,625 @@
 <!DOCTYPE html>
 <html lang="ar" dir="ltr">
+
 <head>
     <meta charset="utf-8" />
-    <!--
-      FIX #1 — viewport meta
-      minimum-scale=1.0 prevents Instagram auto-zoom (breaks layout).
-      viewport-fit=cover enables safe-area-inset-* on notched devices.
-    -->
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0,
-                   maximum-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" name="viewport" />
     <title>Mariam's Room ✦</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌹</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌹</text></svg>">
     <meta name="theme-color" content="#1c0512">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
     <script src="https://unpkg.com/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
-
     <style>
-        /* ══ TOKENS ══════════════════════════════════════════════ */
+        img.emoji { 
+            height: 1.25em; width: 1.25em; margin: 0 .1em; vertical-align: -0.2em;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            image-rendering: -webkit-optimize-contrast;
+        }
         :root {
-            --bg:           #16030a;
-            --text:         #fff;
-            --muted:        rgba(255,220,230,.8);
-            --pink:         #ec4899;
-            --pink-light:   #fce7f3;
-            --glass-border: rgba(255,255,255,.12);
-            --gold:         #d4a851;
-            --card-w:       300px;
-            --card-h:       460px;
-            --hdr:          64px;
-            /*
-              FIX #2 — True vh via JS.
-              Instagram / WebView lie about 100vh (includes browser chrome).
-              JS sets --vh = window.innerHeight * 0.01 (real pixel).
-              Every height calculation uses calc(var(--vh) * N).
-            */
-            --vh: 1vh;
+            --bg: #16030a;
+            --surface: rgba(255, 255, 255, 0.03);
+            --text: #fff;
+            --muted: rgba(255, 220, 230, 0.8);
+            --pink: #ec4899;
+            --pink-light: #fce7f3;
+            --pink-dim: rgba(236, 72, 153, 0.25);
+            --gold: #d4a851;
+            --gold-light: #f8e4b8;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --radius: 480px;
+            /* Carousel Radius */
+            --card-w: 300px;
+            --card-h: 460px;
         }
 
-        /* ══ RESET ═══════════════════════════════════════════════ */
-        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        html {
-            /*
-              FIX #3 — overflow:hidden on <html>.
-              Stops the WebView/Instagram viewport from rubber-banding,
-              which causes position:fixed elements to appear off-screen.
-            */
+        html,
+        body {
+            width: 100%;
+            height: 100dvh;
             overflow: hidden;
-            height: calc(var(--vh) * 100);
             background: var(--bg);
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Cormorant Garamond', serif;
             color: var(--text);
-            overflow: hidden;
-            height: calc(var(--vh) * 100);
-            width: 100%;
-            background: var(--bg);
-            -webkit-text-size-adjust: 100%;
-            -webkit-tap-highlight-color: transparent;
-            /*
-              FIX #4 — touch-action:pan-x.
-              Allows horizontal swipe for carousel while blocking
-              vertical scroll that confuses Instagram's scroll system.
-            */
-            touch-action: pan-x;
-            /* GPU compositing layer fixes z-index stacking in WebView */
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
+            position: relative;
         }
 
-        /* ══ BACKGROUND ══════════════════════════════════════════ */
-        /*
-          FIX #5 — translateZ(0) on every background layer.
-          Promotes each layer to its own GPU composite layer,
-          preventing WebView from repainting them on resize/scroll.
-        */
-        #bg-canvas, canvas#petals {
-            position: fixed; top:0; left:0;
-            width:100%; height:100%;
-            z-index:0; pointer-events:none;
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
+        /* --- High-End Background Layers --- */
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
         }
-        canvas#petals { z-index:3; }
 
         .aurora {
-            position:fixed; inset:0; z-index:1;
-            pointer-events:none; opacity:.6;
-            -webkit-transform: translateZ(0); transform: translateZ(0);
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.6;
         }
+
         .aurora-layer {
-            position:absolute; border-radius:50%;
-            filter:blur(80px); will-change:transform;
+            position: absolute;
+            border-radius: 50%;
+            will-change: transform;
+            filter: blur(80px);
             animation: drift 30s ease-in-out infinite alternate;
         }
+
         .a1 {
-            width:100%; height:80%;
-            background: radial-gradient(circle, rgba(131,24,67,.4) 0%, transparent 70%);
-            top:-20%; left:-20%;
-        }
-        .a2 {
-            width:80%; height:100%;
-            background: radial-gradient(circle, rgba(236,72,153,.2) 0%, transparent 70%);
-            bottom:-20%; right:-20%; animation-duration:25s;
-        }
-        @keyframes drift {
-            from { -webkit-transform:translate(0,0) scale(1);        transform:translate(0,0) scale(1);        }
-            to   { -webkit-transform:translate(6vw,4vh) scale(1.12); transform:translate(6vw,4vh) scale(1.12); }
+            width: 100vw;
+            height: 80vh;
+            background: radial-gradient(circle, rgba(131, 24, 67, 0.4) 0%, transparent 70%);
+            top: -20%;
+            left: -20%;
         }
 
-        /* ══ HEADER ══════════════════════════════════════════════
-          FIX #6 — Header height = --hdr + env(safe-area-inset-top).
-          The padding-top adds safe-area space ABOVE the 64px bar,
-          not inside it. This keeps the bar pixel-perfect on notches.
-        ════════════════════════════════════════════════════════ */
+        .a2 {
+            width: 80vw;
+            height: 100vh;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, transparent 70%);
+            bottom: -20%;
+            right: -20%;
+            animation-duration: 25s;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(8vw, 5vh) scale(1.15);
+            }
+        }
+
+        canvas#petals {
+            position: fixed;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* --- Header --- */
         header {
-            position:fixed; top:0; left:0; right:0; z-index:100;
-            padding-top: env(safe-area-inset-top, 0px);
-            background: rgba(22,3,10,.9);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: calc(1rem + env(safe-area-inset-top)) 2rem 1rem;
+            background: linear-gradient(180deg, rgba(22, 3, 10, 0.8) 0%, transparent 100%);
+            backdrop-filter: blur(15px);
             border-bottom: 1px solid var(--glass-border);
-            -webkit-backdrop-filter: blur(14px);
-            backdrop-filter: blur(14px);
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
         }
-        .header-inner {
-            display:flex; justify-content:space-between; align-items:center;
-            height: var(--hdr); padding: 0 1rem;
-        }
+
         .logo {
-            font-family:'Playfair Display',serif; font-style:italic;
-            font-size: clamp(.88rem, 4vw, 1.32rem);
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.4rem;
             color: var(--pink-light);
-            display:flex; align-items:center; gap:.5rem;
-            white-space:nowrap; overflow:hidden;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
         }
-        .logo .material-symbols-outlined {
-            font-size:1.1rem; color:var(--pink);
+
+        .logo span {
+            font-size: 1.2rem;
+            color: var(--pink);
             animation: breathe 2.5s ease-in-out infinite;
         }
+
         @keyframes breathe {
-            0%,100% { opacity:.5; -webkit-transform:scale(.9); transform:scale(.9); }
-            50%      { opacity:1;  -webkit-transform:scale(1.1); transform:scale(1.1); }
+
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: scale(0.9);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
         }
+
         .header-btn {
-            width:40px; height:40px; border-radius:50%;
-            border:1px solid var(--glass-border);
-            background:rgba(255,255,255,.06); color:#fff;
-            display:flex; align-items:center; justify-content:center;
-            cursor:pointer; text-decoration:none; flex-shrink:0;
-            -webkit-transform:translateZ(0); transform:translateZ(0);
-            transition: background .25s, box-shadow .25s;
-        }
-        .header-btn:active { background:var(--pink); box-shadow:0 6px 18px rgba(236,72,153,.4); }
-        .header-btn .material-symbols-outlined { font-size:20px; }
-
-        /* ══ MAIN SHELL ══════════════════════════════════════════
-          FIX #7 — Replace padding-top on 100vh container.
-          Original: .page-scroll { height:100dvh; padding-top:80px }
-            → content overflows on short screens because padding
-              adds to height inside a fixed-height box.
-          Fix: position:fixed with explicit top/bottom = zero overflow,
-               perfect centering via flexbox regardless of content size.
-        ════════════════════════════════════════════════════════ */
-        .main-shell {
-            position:fixed;
-            top: calc(var(--hdr) + env(safe-area-inset-top, 0px));
-            left:0; right:0;
-            bottom: env(safe-area-inset-bottom, 0px);
-            z-index:10;
-            display:flex; flex-direction:column;
-            align-items:center; justify-content:center;
-            overflow:hidden;
-            -webkit-transform:translateZ(0); transform:translateZ(0);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            text-decoration: none;
         }
 
-        /* ══ HERO HINT ═══════════════════════════════════════════ */
-        .hero-hint {
-            flex-shrink:0; text-align:center;
-            margin-bottom: 1.5vh;
-            opacity:0;
-            animation: fadeDown .9s ease-out .7s forwards;
-        }
-        .hero-hint p {
-            font-family:'Aref Ruqaa',serif;
-            font-size: clamp(.76rem, 3.2vw, 1.02rem);
-            color:var(--pink-light);
-            background:rgba(236,72,153,.1);
-            padding:.45rem 1.5rem; border-radius:100px;
-            border:1px solid rgba(236,72,153,.22);
-            white-space:nowrap;
-        }
-        @keyframes fadeDown {
-            from { opacity:0; -webkit-transform:translateY(-16px); transform:translateY(-16px); }
-            to   { opacity:1; -webkit-transform:translateY(0);     transform:translateY(0);     }
+        .header-btn:hover {
+            background: var(--pink);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(236, 72, 153, 0.3);
         }
 
-        /* ══ SCENE WRAPPER (scaled by JS) ════════════════════════ */
-        .scene-wrapper {
-            flex-shrink:0;
-            -webkit-transform-origin: center center;
-            transform-origin: center center;
+        /* --- Layout: Page Scroll --- */
+        .page-scroll {
+            width: 100%;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+            padding-top: 80px;
+            overflow: hidden;
         }
 
-        /* ══ 3D CAROUSEL ══════════════════════════════════════════
-          FIX #8 — Full webkit prefix stack for 3D properties.
-          Android WebView before Chrome 72 needs -webkit- prefixes for:
-            • transform-style: preserve-3d
-            • backface-visibility: hidden
-          Without them: cards collapse flat or "ghost" cards appear.
-        ════════════════════════════════════════════════════════ */
-        .scene {
-            width:var(--card-w); height:var(--card-h);
-            -webkit-perspective:1800px; perspective:1800px;
-            -webkit-perspective-origin:50% 50%; perspective-origin:50% 50%;
-            position:relative; cursor:grab;
-        }
-        .scene:active { cursor:grabbing; }
-
-        .carousel {
-            width:100%; height:100%;
-            position:absolute; top:0; left:0;
-            -webkit-transform-style:preserve-3d;
-            transform-style:preserve-3d;
-            will-change:transform;
-        }
-        .flip-card {
-            position:absolute;
-            width:var(--card-w); height:var(--card-h);
-            left:0; top:0;
-            -webkit-transform-style:preserve-3d;
-            transform-style:preserve-3d;
-            will-change:transform;
-        }
-        .flip-card-inner {
-            position:relative; width:100%; height:100%;
-            -webkit-transform-style:preserve-3d;
-            transform-style:preserve-3d;
-            -webkit-transition:-webkit-transform .75s cubic-bezier(.175,.885,.32,1.275);
-            transition:transform .75s cubic-bezier(.175,.885,.32,1.275);
-        }
-        .flip-card.flipped .flip-card-inner {
-            -webkit-transform:rotateY(180deg);
-            transform:rotateY(180deg);
-        }
-        .face {
-            position:absolute; width:100%; height:100%;
-            border-radius:2.2rem;
-            -webkit-backface-visibility:hidden;
-            backface-visibility:hidden;
-            overflow:hidden; padding:1.2rem;
-            border:1px solid var(--glass-border);
-            box-shadow:0 18px 44px rgba(0,0,0,.55);
-        }
-        .card-front {
-            background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(236,72,153,.15));
-            -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
-            display:flex; flex-direction:column;
-        }
-        .photo-wrap {
-            flex:1; border-radius:1.8rem; overflow:hidden;
-            margin-bottom:1rem;
-            border:1px solid rgba(255,255,255,.1);
-            background:rgba(0,0,0,.2);
-        }
-        .photo-wrap img {
-            width:100%; height:100%; object-fit:cover; display:block;
-            -webkit-transform:scale(1); transform:scale(1);
-            -webkit-transition:-webkit-transform .7s ease; transition:transform .7s ease;
-        }
-        .flip-card:hover .photo-wrap img,
-        .flip-card:active .photo-wrap img {
-            -webkit-transform:scale(1.05); transform:scale(1.05);
-        }
-        .card-title {
-            font-family:'Aref Ruqaa',serif; font-size:1.52rem;
-            color:var(--pink-light);
-            display:flex; align-items:center; gap:.5rem; justify-content:center;
-        }
-        .card-title span { color:var(--pink); font-size:1.22rem; }
-        .card-hint {
-            font-family:'Amiri',serif; font-size:.9rem;
-            color:var(--muted); text-align:center; margin-top:.3rem;
-        }
-        .card-back {
-            background:linear-gradient(135deg,#310619,#16030a);
-            -webkit-transform:rotateY(180deg); transform:rotateY(180deg);
-            display:flex; flex-direction:column;
-            align-items:center; justify-content:center;
-            padding:2.2rem; text-align:center;
-        }
-        .card-back::after {
-            content:''; position:absolute; inset:14px;
-            border:1px solid rgba(236,72,153,.16);
-            border-radius:1.8rem; pointer-events:none;
-        }
-        .back-title {
-            font-family:'Playfair Display',serif; font-style:italic;
-            font-size:1.72rem; color:var(--pink); margin-bottom:1.1rem;
-        }
-        .back-poem {
-            font-family:'Amiri',serif; font-size:1.18rem;
-            line-height:1.85; color:var(--text); direction:rtl;
-        }
-
-        /* ══ DOTS ════════════════════════════════════════════════ */
-        .dots { display:flex; gap:.62rem; flex-shrink:0; margin-top:1.4vh; }
-        .dot {
-            width:8px; height:8px; border-radius:50%;
-            background:rgba(236,72,153,.25);
-            transition: all .42s cubic-bezier(.2,.8,.2,1);
-        }
-        .dot.active {
-            background:var(--pink); width:24px;
-            border-radius:8px; box-shadow:0 0 10px var(--pink);
-        }
-
-        /* ══ CONTROLS ════════════════════════════════════════════ */
-        .controls { display:flex; gap:3rem; flex-shrink:0; margin-top:1.4vh; }
-        .ctrl-btn {
-            width:52px; height:52px; border-radius:50%;
-            border:1px solid var(--glass-border);
-            background:rgba(255,255,255,.06); color:#fff;
-            display:flex; align-items:center; justify-content:center;
-            cursor:pointer;
-            -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
-            -webkit-transform:translateZ(0); transform:translateZ(0);
-            transition: background .25s, box-shadow .25s, -webkit-transform .25s, transform .25s;
-        }
-        .ctrl-btn:active {
-            background:var(--pink);
-            -webkit-transform:scale(1.1) translateZ(0); transform:scale(1.1) translateZ(0);
-            box-shadow:0 10px 24px rgba(236,72,153,.45);
-        }
-
-        /* ══ TOASTS ══════════════════════════════════════════════ */
+        /* --- Egyptian Toast Notifications --- */
         .toast-container {
-            position:fixed;
-            /* FIX #9 — max() lifts toast above iOS home indicator */
-            bottom: max(20px, env(safe-area-inset-bottom, 20px));
-            left:50%;
-            -webkit-transform:translateX(-50%); transform:translateX(-50%);
-            z-index:3000;
-            display:flex; flex-direction:column; align-items:center; gap:8px;
-            pointer-events:none; width:90%; max-width:340px;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 350px;
         }
-        .egy-toast {
-            background:rgba(49,6,25,.8);
-            -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
-            border:1px solid rgba(236,72,153,.3); border-radius:100px;
-            padding:.68rem 1.5rem; color:#fff;
-            font-family:'Amiri',serif; font-size:clamp(.88rem,3.5vw,1.04rem);
-            text-align:center; direction:rtl;
-            box-shadow:0 8px 28px rgba(0,0,0,.5);
-            animation: toastIn .52s cubic-bezier(.2,.8,.2,1.2) forwards;
-            position:relative; overflow:hidden;
-        }
-        .egy-toast::before {
-            content:''; position:absolute; inset:0;
-            background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);
-            -webkit-transform:translateX(-100%); transform:translateX(-100%);
-            animation: shimmer 3s infinite;
-        }
-        @keyframes toastIn {
-            from { opacity:0; -webkit-transform:translateY(34px) scale(.82); transform:translateY(34px) scale(.82); }
-            to   { opacity:1; -webkit-transform:translateY(0) scale(1);      transform:translateY(0) scale(1);      }
-        }
-        @keyframes toastOut {
-            to { opacity:0; -webkit-transform:translateY(-16px) scale(.9); transform:translateY(-16px) scale(.9); }
-        }
-        @keyframes shimmer { 100% { -webkit-transform:translateX(100%); transform:translateX(100%); } }
 
-        /* ══ PAPYRUS SCROLL ══════════════════════════════════════
-          FIX #10 — inset:0 ensures overlay covers the real viewport
-          including area behind Instagram's top chrome bar.
-        ════════════════════════════════════════════════════════ */
+        .egy-toast {
+            background: rgba(49, 6, 25, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            border-radius: 100px;
+            padding: 0.8rem 1.8rem;
+            color: #fff;
+            font-family: 'Amiri', serif;
+            font-size: 1.1rem;
+            text-align: center;
+            direction: rtl;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: toastEnter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.2) forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .egy-toast::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transform: translateX(-100%);
+            animation: toastShimmer 3s infinite;
+        }
+
+        @keyframes toastEnter {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes toastExit {
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.9);
+            }
+        }
+
+        @keyframes toastShimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* --- Papyrus Scroll Styles --- */
         #scroll-overlay {
-            position:fixed; inset:0;
-            background:rgba(0,0,0,.88); z-index:5000;
-            display:none; align-items:center; justify-content:center;
-            -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
-            opacity:0; transition:opacity .42s;
-            padding: env(safe-area-inset-top,0px) 1rem env(safe-area-inset-bottom,0px);
-            -webkit-transform:translateZ(0); transform:translateZ(0);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 5000;
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px);
+            opacity: 0; transition: opacity 0.5s;
         }
         .scroll-container {
-            width:90%; max-width:480px; position:relative;
-            -webkit-transform-origin:center top; transform-origin:center top;
-            -webkit-transform:scaleY(0); transform:scaleY(0);
+            width: 90%; max-width: 500px; position: relative;
+            transform-origin: center top; transform: scaleY(0);
         }
         .papyrus {
-            background:#f4e4bc;
-            background-image:url('https://www.transparenttextures.com/patterns/natural-paper.png');
-            border-left:14px solid var(--gold); border-right:14px solid var(--gold);
-            box-shadow:0 0 50px rgba(0,0,0,.8),inset 0 0 28px rgba(0,0,0,.1);
-            padding:2.8rem 1.8rem; border-radius:4px;
-            position:relative; display:flex; flex-direction:column; align-items:center;
+            background: #f4e4bc; background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+            border-left: 15px solid #d4a851; border-right: 15px solid #d4a851;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.1);
+            padding: 3rem 2rem; border-radius: 5px; position: relative;
+            min-height: 400px; display: flex; flex-direction: column; align-items: center;
         }
-        .papyrus::before,.papyrus::after {
-            content:''; position:absolute; left:-24px; right:-24px; height:28px;
-            background:#c6a664; border-radius:50px; box-shadow:0 5px 14px rgba(0,0,0,.3);
+        .papyrus::before, .papyrus::after {
+            content: ''; position: absolute; left: -25px; right: -25px; height: 30px;
+            background: #c6a664; border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        .papyrus::before { top:-14px; }
-        .papyrus::after  { bottom:-14px; }
+        .papyrus::before { top: -15px; }
+        .papyrus::after { bottom: -15px; }
+        
         .scroll-text {
-            font-family:'Amiri',serif; font-size:clamp(1rem,4vw,1.42rem);
-            line-height:1.85; color:#3d2b1f;
-            text-align:center; direction:rtl; width:100%;
+            font-family: 'Amiri', serif; font-size: 1.5rem; line-height: 1.8; color: #3d2b1f;
+            text-align: center; direction: rtl; opacity: 1; /* Managed via spans in JS */
+            width: 100%;
         }
-        .scroll-text span {
-            display:inline-block; opacity:0;
-            -webkit-transform:translateY(10px); transform:translateY(10px);
-            -webkit-filter:blur(5px); filter:blur(5px);
-        }
+        .scroll-text span { display: inline-block; opacity: 0; transform: translateY(10px); filter: blur(5px); }
         .scroll-close {
-            margin-top:1.8rem; padding:.52rem 1.8rem;
-            border:1px solid #3d2b1f; background:transparent;
-            font-family:'Amiri',serif; font-size:1rem;
-            cursor:pointer; border-radius:50px;
-            color:#3d2b1f; transition:background .25s,color .25s;
+            margin-top: 2rem; padding: 0.6rem 2rem; border: 1px solid #3d2b1f;
+            background: transparent; font-family: 'Amiri', serif; cursor: pointer;
+            border-radius: 50px; color: #3d2b1f; transition: 0.3s;
         }
-        .scroll-close:active { background:#3d2b1f; color:#f4e4bc; }
+        .scroll-close:hover { background: #3d2b1f; color: #f4e4bc; }
 
-        /* ══ LIGHTBOX ════════════════════════════════════════════ */
+        /* --- Witty Intro --- */
+        .hero-hint {
+            margin-bottom: 2rem;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInDown 1s ease-out 0.8s forwards;
+        }
+
+        .hero-hint p {
+            font-family: 'Aref Ruqaa', serif;
+            font-size: 1.1rem;
+            color: var(--pink-light);
+            background: rgba(236, 72, 153, 0.1);
+            padding: .7rem 2.5rem;
+            border-radius: 100px;
+            border: 1px solid rgba(236, 72, 153, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- 3D Carousel Engine --- */
+        .scene {
+            width: var(--card-w);
+            height: var(--card-h);
+            perspective: 2000px;
+            position: relative;
+            cursor: grab;
+            transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            will-change: transform;
+            transform: scale(var(--s, 1));
+        }
+
+        .scene:active {
+            cursor: grabbing;
+        }
+
+        /* Auto-scaling carousel */
+        @media (max-width: 1024px) {
+            .scene {
+                --s: 0.85;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .scene {
+                --s: 0.75;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .scene {
+                --s: 0.65;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .scene {
+                --s: 0.55;
+            }
+        }
+
+        .carousel {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            transform: translateZ(calc(var(--radius) * -1)) rotateY(0deg);
+            will-change: transform;
+        }
+
+        .flip-card {
+            position: absolute;
+            width: var(--card-w);
+            height: var(--card-h);
+            left: 0;
+            top: 0;
+            transform-style: preserve-3d;
+            transition: opacity 0.5s;
+            will-change: transform;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 2.2rem;
+            backface-visibility: hidden;
+            overflow: hidden;
+            padding: 1.2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Front Face: Modern Glassmorphism */
+        .card-front {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(236, 72, 153, 0.15));
+            backdrop-filter: blur(25px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .photo-wrap {
+            flex: 1;
+            border-radius: 1.8rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .photo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .flip-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .card-title {
+            font-family: 'Aref Ruqaa', serif;
+            font-size: 1.6rem;
+            color: var(--pink-light);
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            justify-content: center;
+        }
+
+        .card-title span {
+            color: var(--pink);
+            font-size: 1.3rem;
+        }
+
+        .card-hint {
+            font-family: 'Amiri', serif;
+            font-size: 0.95rem;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 0.3rem;
+        }
+
+        /* Back Face: Deep Romantic Rose */
+        .card-back {
+            background: linear-gradient(135deg, #310619, #16030a);
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .card-back::after {
+            content: '';
+            position: absolute;
+            inset: 15px;
+            border: 1px solid rgba(236, 72, 153, 0.15);
+            border-radius: 1.8rem;
+            pointer-events: none;
+        }
+
+        .back-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--pink);
+            margin-bottom: 1.2rem;
+            font-style: italic;
+        }
+
+        .back-poem {
+            font-family: 'Amiri', serif;
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: var(--text);
+            direction: rtl;
+        }
+
+        /* --- Controls & UI --- */
+        .controls {
+            display: flex;
+            gap: 4rem;
+            margin-top: 2.5rem;
+            z-index: 50;
+        }
+
+        .ctrl-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .ctrl-btn:hover {
+            background: var(--pink);
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(236, 72, 153, 0.4);
+        }
+
+        .dots {
+            display: flex;
+            gap: .8rem;
+            margin-top: 2rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(236, 72, 153, 0.25);
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .dot.active {
+            background: var(--pink);
+            width: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px var(--pink);
+        }
+
+        /* --- Lightbox --- */
         #lightbox {
-            position:fixed; inset:0;
-            background:rgba(0,0,0,.96); z-index:2000;
-            display:none; align-items:center; justify-content:center;
-            -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
-            opacity:0; transition:opacity .32s;
-            -webkit-transform:translateZ(0); transform:translateZ(0);
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            transition: opacity 0.4s;
         }
-        #lightbox.visible { display:flex; opacity:1; }
+
+        #lightbox.visible {
+            display: flex;
+            opacity: 1;
+        }
+
         #lb-img {
-            max-width:92%; max-height:88%; border-radius:.5rem; display:block;
-            box-shadow:0 0 80px rgba(236,72,153,.18);
+            max-width: 90%;
+            max-height: 85%;
+            border-radius: 0.5rem;
+            box-shadow: 0 0 100px rgba(236, 72, 153, 0.2);
         }
+
         .lb-close {
-            position:absolute;
-            top: max(28px, env(safe-area-inset-top, 28px));
-            right:24px; color:#fff; font-size:2rem; cursor:pointer; line-height:1;
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: #fff;
+            font-size: 2.5rem;
+            cursor: pointer;
         }
 
-        /* ══ PORTAL REVEAL ═══════════════════════════════════════ */
+        /* --- Page Entrance Portal --- */
         #portal-reveal {
-            position:fixed; inset:0; background:#fff; z-index:9999;
-            pointer-events:none;
-            -webkit-clip-path:circle(150% at 50% 50%);
-            clip-path:circle(150% at 50% 50%);
-            -webkit-transform:translateZ(0); transform:translateZ(0);
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            z-index: 9999;
+            pointer-events: none;
+            clip-path: circle(150% at 50% 50%);
         }
 
-        img.emoji {
-            height:1.2em; width:1.2em; margin:0 .08em; vertical-align:-.18em;
-            filter:drop-shadow(0 1px 3px rgba(0,0,0,.3));
-            image-rendering:-webkit-optimize-contrast;
+        @keyframes fadeInDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .controls {
+                gap: 2rem;
+            }
+
+            .hero-hint p {
+                font-size: 0.95rem;
+                padding: .6rem 1.8rem;
+            }
+
+            header {
+                padding: 1.2rem;
+            }
         }
     </style>
 </head>
+
 <body>
+
     <div id="portal-reveal"></div>
 
     <audio id="bg-music" loop preload="auto">
@@ -477,119 +634,105 @@
     <canvas id="petals"></canvas>
 
     <header>
-        <div class="header-inner">
-            <div class="logo">
-                Mariam's World
-                <span class="material-symbols-outlined">favorite</span>
-            </div>
-            <div style="display:flex;gap:.65rem;flex-shrink:0;">
-                <button class="header-btn" onclick="toggleScroll()" title="رسالة خاصة">
-                    <span class="material-symbols-outlined">drafts</span>
-                </button>
-                <button class="header-btn" onclick="toggleAudio()">
-                    <span class="material-symbols-outlined" id="a-icon">music_off</span>
-                </button>
-                <a href="index.html" class="header-btn">
-                    <span class="material-symbols-outlined">home</span>
-                </a>
-            </div>
+        <div class="logo">Mariam's World <span class="material-symbols-outlined">favorite</span></div>
+        <div style="display:flex; gap: 0.8rem;">
+            <button class="header-btn" onclick="toggleScroll()" title="رسالة خاصة"><span class="material-symbols-outlined">drafts</span></button>
+            <button class="header-btn" onclick="toggleAudio()"><span class="material-symbols-outlined"
+                    id="a-icon">music_off</span></button>
+            <a href="index.html" class="header-btn"><span class="material-symbols-outlined">home</span></a>
         </div>
     </header>
 
-    <div class="main-shell" id="main-shell">
-
+    <div class="page-scroll">
         <div class="hero-hint">
             <p>اسحبي بأصبعك كدا.. وريني الشطارة 😉 ✨</p>
         </div>
 
-        <div class="scene-wrapper" id="scene-wrapper">
-            <div class="scene" id="scene">
-                <div class="carousel" id="carousel">
-
-                    <div class="flip-card" onclick="handleCardClick(this)">
-                        <div class="flip-card-inner">
-                            <div class="face card-front">
-                                <div class="photo-wrap"><img src="p1.jpg" alt="P1" onerror="this.src='https://picsum.photos/400/600?random=1'"></div>
-                                <p class="card-title">حكاية وردة <span>✿</span></p>
-                                <p class="card-hint">انقري عشان الدلع 😉</p>
-                            </div>
-                            <div class="face card-back">
-                                <p class="back-title">لغة العيون</p>
-                                <p class="back-poem">" في عيونك ألف معنى وقصيدة، وفي ضحكتك حياة تانية جديدة.. "</p>
-                            </div>
+        <div class="scene" id="scene">
+            <div class="carousel" id="carousel">
+                <div class="flip-card" onclick="handleCardClick(this)">
+                    <div class="flip-card-inner">
+                        <div class="face card-front">
+                            <div class="photo-wrap"><img src="p1.jpg" alt="P1"
+                                    onerror="this.src='https://picsum.photos/400/600?rose=1'"></div>
+                            <p class="card-title">حكاية وردة <span>✿</span></p>
+                            <p class="card-hint">انقري عشان الدلع 😉</p>
+                        </div>
+                        <div class="face card-back">
+                            <p class="back-title">لغة العيون</p>
+                            <p class="back-poem">" في عيونك ألف معنى وقصيدة، وفي ضحكتك حياة تانية جديدة.. "</p>
                         </div>
                     </div>
-
-                    <div class="flip-card" onclick="handleCardClick(this)">
-                        <div class="flip-card-inner">
-                            <div class="face card-front">
-                                <div class="photo-wrap"><img src="p2.jpg" alt="P2" onerror="this.src='https://picsum.photos/400/600?random=2'"></div>
-                                <p class="card-title">سحر الليل <span>★</span></p>
-                                <p class="card-hint">في صورة كدة ليكي.. قمر 😉</p>
-                            </div>
-                            <div class="face card-back">
-                                <p class="back-title">سهر الليالي</p>
-                                <p class="back-poem">" كأنك قمر في وسط العتمة بيبان، والكون كله قصاد جمالك هيمان.. "</p>
-                            </div>
+                </div>
+                <div class="flip-card" onclick="handleCardClick(this)">
+                    <div class="flip-card-inner">
+                        <div class="face card-front">
+                            <div class="photo-wrap"><img src="p2.jpg" alt="P2"
+                                    onerror="this.src='https://picsum.photos/400/600?rose=2'"></div>
+                            <p class="card-title">سحر الليل <span>★</span></p>
+                            <p class="card-hint">في صورة كدة ليكي.. قمر 😉</p>
+                        </div>
+                        <div class="face card-back">
+                            <p class="back-title">سهر الليالي</p>
+                            <p class="back-poem">" كأنك قمر في وسط العتمة بيبان، والكون كله قصاد جمالك هيمان.. "</p>
                         </div>
                     </div>
-
-                    <div class="flip-card" onclick="handleCardClick(this)">
-                        <div class="flip-card-inner">
-                            <div class="face card-front">
-                                <div class="photo-wrap"><img src="p3.jpg" alt="P3" onerror="this.src='https://picsum.photos/400/600?random=3'"></div>
-                                <p class="card-title">همس الروح <span>❤</span></p>
-                                <p class="card-hint">انقري وادعيلي 😉</p>
-                            </div>
-                            <div class="face card-back">
-                                <p class="back-title">نبض القلب</p>
-                                <p class="back-poem">" يا اللي حضورك بيحلّي أي مكان، دايماً جوه القلب ليكي كيان.. "</p>
-                            </div>
+                </div>
+                <div class="flip-card" onclick="handleCardClick(this)">
+                    <div class="flip-card-inner">
+                        <div class="face card-front">
+                            <div class="photo-wrap"><img src="p3.jpg" alt="P3"
+                                    onerror="this.src='https://picsum.photos/400/600?rose=3'"></div>
+                            <p class="card-title">همس الروح <span>❤</span></p>
+                            <p class="card-hint">انقري وادعيلي 😉</p>
+                        </div>
+                        <div class="face card-back">
+                            <p class="back-title">نبض القلب</p>
+                            <p class="back-poem">" يا اللي حضورك بيحلّي أي مكان، دايماً جوه القلب ليكي كيان.. "</p>
                         </div>
                     </div>
-
-                    <div class="flip-card" onclick="handleCardClick(this)">
-                        <div class="flip-card-inner">
-                            <div class="face card-front">
-                                <div class="photo-wrap"><img src="p4.jpg" alt="P4" onerror="this.src='https://picsum.photos/400/600?random=4'"></div>
-                                <p class="card-title">أجمل صدفة <span>✧</span></p>
-                                <p class="card-hint">الورد يغير منك 😉</p>
-                            </div>
-                            <div class="face card-back">
-                                <p class="back-title">صدفة جميلة</p>
-                                <p class="back-poem">" مكنتش أعرف إن الصدفة ممكن تكون بالجمال ده كله.. "</p>
-                            </div>
+                </div>
+                <div class="flip-card" onclick="handleCardClick(this)">
+                    <div class="flip-card-inner">
+                        <div class="face card-front">
+                            <div class="photo-wrap"><img src="p4.jpg" alt="P4"
+                                    onerror="this.src='https://picsum.photos/400/600?rose=4'"></div>
+                            <p class="card-title">أجمل صدفة <span>✧</span></p>
+                            <p class="card-hint">الورد يغير منك 😉</p>
+                        </div>
+                        <div class="face card-back">
+                            <p class="back-title">صدفة جميلة</p>
+                            <p class="back-poem">" مكنتش أعرف إن الصدفة ممكن تكون بالجمال ده كله.. "</p>
                         </div>
                     </div>
-
-                    <div class="flip-card" onclick="handleCardClick(this)">
-                        <div class="flip-card-inner">
-                            <div class="face card-front">
-                                <div class="photo-wrap"><img src="p5.jpg" alt="P5" onerror="this.src='https://picsum.photos/400/600?random=5'"></div>
-                                <p class="card-title">نور الضحكة <span>☀</span></p>
-                                <p class="card-hint">ضحكتك بالدنيا 😉</p>
-                            </div>
-                            <div class="face card-back">
-                                <p class="back-title">نور الدنيا</p>
-                                <p class="back-poem">" خلي دايماً الضحكة مرسومة، إنتي في الجمال بجد حكومة.. "</p>
-                            </div>
+                </div>
+                <div class="flip-card" onclick="handleCardClick(this)">
+                    <div class="flip-card-inner">
+                        <div class="face card-front">
+                            <div class="photo-wrap"><img src="p5.jpg" alt="P5"
+                                    onerror="this.src='https://picsum.photos/400/600?rose=5'"></div>
+                            <p class="card-title">نور الضحكة <span>☀</span></p>
+                            <p class="card-hint">ضحكتك بالدنيا 😉</p>
+                        </div>
+                        <div class="face card-back">
+                            <p class="back-title">نور الدنيا</p>
+                            <p class="back-poem">" خلي دايماً الضحكة مرسومة، إنتي في الجمال بجد حكومة.. "</p>
                         </div>
                     </div>
-
-                    <div class="flip-card" onclick="handleCardClick(this)">
-                        <div class="flip-card-inner">
-                            <div class="face card-front">
-                                <div class="photo-wrap"><img src="p6.jpg" alt="P6" onerror="this.src='https://picsum.photos/400/600?random=6'"></div>
-                                <p class="card-title">دلع مصري <span>⚓</span></p>
-                                <p class="card-hint">آخر جمال 😉</p>
-                            </div>
-                            <div class="face card-back">
-                                <p class="back-title">أصل الدلع</p>
-                                <p class="back-poem">" الدلع ليكي لوحده، والجمال مالوش زيّك حد.. "</p>
-                            </div>
+                </div>
+                <div class="flip-card" onclick="handleCardClick(this)">
+                    <div class="flip-card-inner">
+                        <div class="face card-front">
+                            <div class="photo-wrap"><img src="p6.jpg" alt="P6"
+                                    onerror="this.src='https://picsum.photos/400/600?rose=6'"></div>
+                            <p class="card-title">دلع مصري <span>⚓</span></p>
+                            <p class="card-hint">آخر جمال 😉</p>
+                        </div>
+                        <div class="face card-back">
+                            <p class="back-title">أصل الدلع</p>
+                            <p class="back-poem">" الدلع ليكي لوحده، والجمال مالوش زيّك حد.. "</p>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -597,27 +740,22 @@
         <div class="dots" id="dots"></div>
 
         <div class="controls">
-            <button class="ctrl-btn" onclick="navCarousel(1)">
-                <span class="material-symbols-outlined" style="-webkit-transform:scaleX(-1);transform:scaleX(-1)">arrow_forward</span>
-            </button>
-            <button class="ctrl-btn" onclick="navCarousel(-1)">
-                <span class="material-symbols-outlined">arrow_forward</span>
-            </button>
+            <button class="ctrl-btn" onclick="navCarousel(1)"><span class="material-symbols-outlined"
+                    style="transform:scaleX(-1)">arrow_forward</span></button>
+            <button class="ctrl-btn" onclick="navCarousel(-1)"><span
+                    class="material-symbols-outlined">arrow_forward</span></button>
         </div>
-
-    </div><!-- /main-shell -->
-
-    <div id="lightbox" onclick="closeLB()">
-        <span class="lb-close">✕</span>
-        <img id="lb-img" src="" alt="">
     </div>
 
+    <div id="lightbox" onclick="closeLB()"><span class="lb-close">✕</span><img id="lb-img" src=""></div>
     <div class="toast-container" id="toast-container"></div>
-
+    
     <div id="scroll-overlay" onclick="closeScroll()">
         <div class="scroll-container" id="scroll-anim">
             <div class="papyrus" onclick="event.stopPropagation()">
-                <div class="scroll-text" id="scroll-text">مريم.. في ناس حضورها بيطغي على المكان، وإنتي حضورك بيضيف للمكان روح ورُقيّ. ذوقك وتعاملك المحترم مع الناس بجد حاجة تدرّس، وإنتِ مثال للشخصية اللي بتجبر الكل إنه يقدرها ويقدر مسافتها وجمالها الهادي. بجد إنتِ إضافة لأي مكان بتدخلي فيه، وتفضلي دايماً متألقة بنجاحك ونضجك اللي ملّوش زي. تفضلي دايماً يا ست الكل في أحسن حال. ✨📜✨</div>
+                <div class="scroll-text" id="scroll-text">
+                    مريم.. في ناس حضورها بيطغي على المكان، وإنتي حضورك بيضيف للمكان روح ورُقيّ. ذوقك وتعاملك المحترم مع الناس بجد حاجة تدرّس، وإنتِ مثال للشخصية اللي بتجبر الكل إنه يقدرها ويقدر مسافتها وجمالها الهادي. بجد إنتِ إضافة لأي مكان بتدخلي فيه، وتفضلي دايماً متألقة بنجاحك ونضجك اللي ملّوش زي. تفضلي دايماً يا ست الكل في أحسن حال. ✨📜✨
+                </div>
                 <button class="scroll-close" onclick="closeScroll()">إغلاق البردية</button>
             </div>
         </div>
@@ -625,338 +763,305 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script>
-    /* ═══════════════════════════════════════════════════════════
-       ALL SHARED STATE — at top scope to avoid Temporal Dead Zone
-    ═══════════════════════════════════════════════════════════ */
-    const CARD_W    = 300;
-    const CARD_H    = 460;
-    let   RADIUS    = 440;
-    const carousel  = document.getElementById('carousel');
-    const cards     = document.querySelectorAll('.flip-card');
-    const dotsBox   = document.getElementById('dots');
-    const angleStep = 360 / cards.length;
-    let   rotation  = 0;
-    let   isDragging = false, startX, startRot, hasDragged = false;
-    let   audioCtx, analyser, dataArray;
-    let   W, H;
+        // --- 1. Background Particles Engine ---
+        const bC = document.getElementById('bg-canvas'), bX = bC.getContext('2d');
+        const pC = document.getElementById('petals'), pX = pC.getContext('2d');
+        let stars = [], petals = [], w, h;
+        let audioCtx, analyser, dataArray;
 
-    // ── Safe twemoji ─────────────────────────────────────────────
-    const safeTwemoji = (el, opts) => {
-        try { if (typeof twemoji !== 'undefined') twemoji.parse(el, opts || { folder:'svg', ext:'.svg' }); }
-        catch(e) {}
-    };
-
-    /* ═══════════════════════════════════════════════════════════
-       FIX #11 — --vh sync: the single most important fix.
-       Called immediately + on every resize/orientationchange.
-       Debounced to prevent jank during orientation flip animation.
-    ═══════════════════════════════════════════════════════════ */
-    let resizeTimer;
-    function syncVH() {
-        document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-    }
-    function onResize() {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            syncVH(); resizeCanvas(); updateCarouselRadius(); fitScene();
-        }, 80);
-    }
-    syncVH(); // immediate — before any layout paint
-    window.addEventListener('resize', onResize);
-    window.addEventListener('orientationchange', () => setTimeout(() => { syncVH(); fitScene(); }, 300));
-
-    /* ═══════════════════════════════════════════════════════════
-       CANVAS — Stars & Petals
-    ═══════════════════════════════════════════════════════════ */
-    const bC = document.getElementById('bg-canvas'), bX = bC.getContext('2d');
-    const pC = document.getElementById('petals'),    pX = pC.getContext('2d');
-    let stars = [], petals = [];
-
-    function resizeCanvas() {
-        W = bC.width = pC.width  = window.innerWidth;
-        H = bC.height = pC.height = window.innerHeight;
-        stars = Array.from({length:80}, () => ({
-            x:Math.random()*W, y:Math.random()*H,
-            r:Math.random()*1.4, o:Math.random(), s:.01+Math.random()*.02
-        }));
-    }
-    function mkPetal() {
-        return { x:Math.random()*W, y:-20, sz:3+Math.random()*5,
-                 sp:.7+Math.random()*1.4, dr:(Math.random()-.5)*.7,
-                 ro:Math.random()*Math.PI, rs:.02+Math.random()*.03 };
-    }
-    resizeCanvas();
-    petals = Array.from({length:22}, mkPetal);
-
-    (function animLoop() {
-        bX.clearRect(0,0,W,H); pX.clearRect(0,0,W,H);
-        let bass = 0;
-        if (analyser) { analyser.getByteFrequencyData(dataArray); bass = dataArray[2]/255; }
-
-        bX.fillStyle = '#fff';
-        stars.forEach(s => {
-            s.o += s.s + bass*.04;
-            bX.globalAlpha = .15 + Math.abs(Math.sin(s.o))*.7;
-            bX.beginPath(); bX.arc(s.x,s.y,s.r,0,Math.PI*2); bX.fill();
-        });
-
-        pX.fillStyle = '#f9a8d4';
-        petals.forEach((p,i) => {
-            p.y += p.sp+bass*1.8; p.x += p.dr; p.ro += p.rs;
-            if (p.y > H+20) petals[i] = mkPetal();
-            pX.save(); pX.translate(p.x,p.y); pX.rotate(p.ro); pX.globalAlpha = .42;
-            pX.beginPath(); pX.ellipse(0,0,p.sz,p.sz*1.4,0,0,Math.PI*2); pX.fill();
-            pX.restore();
-        });
-        requestAnimationFrame(animLoop);
-    })();
-
-    /* ═══════════════════════════════════════════════════════════
-       FIX #12 — JS-driven scene scaling.
-       Measures real available height inside .main-shell at runtime,
-       accounting for Instagram's chrome, WebView system bars, etc.
-       CSS media queries cannot do this — they use the full vh.
-    ═══════════════════════════════════════════════════════════ */
-    function fitScene() {
-        const wrapper = document.getElementById('scene-wrapper');
-        const shell   = document.getElementById('main-shell');
-        const hint    = document.querySelector('.hero-hint');
-        const dotsEl  = document.getElementById('dots');
-        const ctrlEl  = document.querySelector('.controls');
-
-        const shellH = shell.getBoundingClientRect().height || window.innerHeight * .85;
-        const shellW = window.innerWidth;
-
-        const vGap = Math.round(shellH * .015); // 1.5vh equivalent
-        const hintH = (hint   ? hint.offsetHeight   : 44) + vGap * 2;
-        const dotsH = (dotsEl ? dotsEl.offsetHeight : 10) + vGap * 2;
-        const ctrlH = (ctrlEl ? ctrlEl.offsetHeight : 52) + vGap * 2;
-
-        const availH = shellH - hintH - dotsH - ctrlH - 16;
-        const availW = shellW - 32;
-
-        const scale   = Math.min(availH / CARD_H, availW / CARD_W, 1);
-        const trimmed = CARD_H * (1 - scale); // blank space created by scaling down
-
-        wrapper.style.cssText = `
-            width:${CARD_W}px;
-            height:${CARD_H}px;
-            transform:scale(${scale});
-            -webkit-transform:scale(${scale});
-            margin-top:-${trimmed/2}px;
-            margin-bottom:-${trimmed/2}px;
-        `;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       3D CAROUSEL
-    ═══════════════════════════════════════════════════════════ */
-    function updateCarouselRadius() {
-        const w = window.innerWidth;
-        RADIUS = w < 380 ? 300 : w < 560 ? 350 : w < 900 ? 410 : 460;
-        cards.forEach((c,i) => {
-            gsap.set(c, { rotationY: i*angleStep, transformOrigin:`50% 50% -${RADIUS}px`, z:RADIUS });
-        });
-        gsap.set(carousel, { transformOrigin:`50% 50% -${RADIUS}px` });
-    }
-
-    cards.forEach((_,i) => {
-        const d = document.createElement('div');
-        d.className = 'dot' + (i===0 ? ' active' : '');
-        dotsBox.appendChild(d);
-    });
-
-    function updateDots() {
-        const idx = (Math.round(-rotation/angleStep) % cards.length + cards.length) % cards.length;
-        document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===idx));
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       FIX #13 — Touch handlers on scene element, not window.
-       Binding to window caused conflicts with Instagram's own
-       scroll capture, making the carousel fight the page.
-
-       FIX #14 — Non-passive touchmove with preventDefault.
-       Prevents Instagram's rubber-band scroll from hijacking
-       a carousel swipe mid-gesture.
-    ═══════════════════════════════════════════════════════════ */
-    const sceneEl = document.getElementById('scene');
-
-    const onStart = x => { isDragging=true; startX=x; startRot=rotation; hasDragged=false; };
-    const onMove  = x => {
-        if (!isDragging) return;
-        const d = x - startX;
-        if (Math.abs(d) > 4) hasDragged = true;
-        rotation = startRot + d * .22;
-        gsap.set(carousel, { rotationY: rotation });
-    };
-    const onEnd = () => {
-        if (!isDragging) return;
-        isDragging = false;
-        const prev = Math.round(startRot/angleStep)*angleStep;
-        rotation   = Math.round(rotation/angleStep)*angleStep;
-        gsap.to(carousel, { rotationY:rotation, duration:.72, ease:'power2.out', onUpdate:updateDots });
-        if (rotation !== prev) showToast();
-    };
-
-    sceneEl.addEventListener('mousedown',  e => onStart(e.pageX));
-    window.addEventListener ('mousemove',  e => { if (isDragging) onMove(e.pageX); });
-    window.addEventListener ('mouseup',    onEnd);
-    sceneEl.addEventListener('touchstart', e => onStart(e.touches[0].pageX), { passive:true });
-    sceneEl.addEventListener('touchmove',  e => {
-        if (isDragging && hasDragged) e.preventDefault();
-        onMove(e.touches[0].pageX);
-    }, { passive:false }); // non-passive so preventDefault works
-    sceneEl.addEventListener('touchend', onEnd, { passive:true });
-
-    function navCarousel(dir) {
-        rotation += dir * angleStep;
-        gsap.to(carousel, { rotationY:rotation, duration:.72, ease:'power2.out', onUpdate:updateDots });
-        showToast();
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       CARD FLIP
-    ═══════════════════════════════════════════════════════════ */
-    function handleCardClick(el) {
-        if (hasDragged) return;
-        el.classList.toggle('flipped');
-        if (el.classList.contains('flipped')) showToast();
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       TOAST
-    ═══════════════════════════════════════════════════════════ */
-    const cheers = [
-        'الجمال ده محتاج ترخيص! 😉','ذوق ورُقيّ ملهوش زي! ✨',
-        'يا ست الكل، منورة الدنيا بطلتك! 🌟','شخصية تجبر الكل على احترامها.. 👏',
-        'إيه الشياكة دي؟ مفيّش كدة! ✨','قمر بصحيح.. الله أكبر عليكي! 🧿',
-        'المكان نور بوجودك يا مريم! ✦','ذوقك دايماً في حتة تانية خالص.. 🌟'
-    ];
-    function showToast() {
-        const box = document.getElementById('toast-container');
-        if (!box) return;
-        const t = document.createElement('div');
-        t.className = 'egy-toast';
-        t.innerText = cheers[Math.floor(Math.random()*cheers.length)];
-        box.appendChild(t);
-        safeTwemoji(t);
-        setTimeout(() => {
-            t.style.animation = 'toastOut .48s ease forwards';
-            setTimeout(() => t.remove(), 480);
-        }, 3200);
-    }
-    setInterval(() => { if (Math.random()>.58) showToast(); }, 22000);
-
-    /* ═══════════════════════════════════════════════════════════
-       FIX #15 — AudioContext wrapped in try/catch.
-       Some Instagram WebViews block AudioContext entirely.
-       Without the catch the entire script would crash.
-    ═══════════════════════════════════════════════════════════ */
-    function initVisualizer() {
-        if (audioCtx) return;
-        try {
+        function initVisualizer() {
+            if (audioCtx) return;
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const src = audioCtx.createMediaElementSource(document.getElementById('bg-music'));
-            analyser  = audioCtx.createAnalyser();
-            src.connect(analyser); analyser.connect(audioCtx.destination);
+            const source = audioCtx.createMediaElementSource(document.getElementById('bg-music'));
+            analyser = audioCtx.createAnalyser();
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
             analyser.fftSize = 256;
             dataArray = new Uint8Array(analyser.frequencyBinCount);
-        } catch(e) { console.warn('AudioContext unavailable'); }
-    }
-
-    const audioEl = document.getElementById('bg-music');
-    function toggleAudio() {
-        if (audioCtx && audioCtx.state==='suspended') audioCtx.resume();
-        if (audioEl.paused) {
-            audioEl.play().catch(()=>{});
-            document.getElementById('a-icon').innerText = 'music_note';
-        } else {
-            audioEl.pause();
-            document.getElementById('a-icon').innerText = 'music_off';
         }
-    }
 
-    /* PAPYRUS SCROLL */
-    function toggleScroll() {
-        if (audioEl.paused) audioEl.play()
-            .then(()=>document.getElementById('a-icon').innerText='music_note').catch(()=>{});
-        const ov  = document.getElementById('scroll-overlay');
-        const tex = document.getElementById('scroll-text');
-        if (!tex.innerHTML.includes('</span>'))
-            tex.innerHTML = tex.innerText.split(' ').map(w=>`<span>${w}</span>`).join(' ');
-        ov.style.display = 'flex';
-        requestAnimationFrame(() => {
-            ov.style.opacity = '1';
-            gsap.to('#scroll-anim',    { scaleY:1, duration:1.4, ease:'expo.out' });
-            gsap.to('#scroll-text span',{
-                opacity:1, y:0, filter:'blur(0px)',
-                duration:.72, stagger:.046, delay:.48, ease:'power2.out',
-                onComplete:() => safeTwemoji(tex)
+        function resize() {
+            w = bC.width = pC.width = window.innerWidth;
+            h = bC.height = pC.height = window.innerHeight;
+            stars = Array.from({ length: 80 }, () => ({
+                x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.5,
+                o: Math.random(), s: 0.01 + Math.random() * 0.02
+            }));
+        }
+
+        function createPetal() {
+            return {
+                x: Math.random() * w, y: -20, sz: 3 + Math.random() * 6,
+                sp: 0.8 + Math.random() * 1.5, dr: (Math.random() - 0.5) * 0.8,
+                ro: Math.random() * Math.PI, rs: 0.02 + Math.random() * 0.03
+            };
+        }
+
+        petals = Array.from({ length: 25 }, createPetal);
+        resize(); window.addEventListener('resize', resize);
+
+        function animate() {
+            bX.clearRect(0, 0, w, h); pX.clearRect(0, 0, w, h);
+
+            let bass = 0;
+            if (analyser) {
+                analyser.getByteFrequencyData(dataArray);
+                bass = dataArray[2] / 255;
+            }
+
+            // Stars loop
+            bX.fillStyle = "#fff";
+            stars.forEach(s => {
+                s.o += s.s + (bass * 0.05);
+                bX.globalAlpha = 0.2 + (Math.abs(Math.sin(s.o)) * 0.7);
+                bX.beginPath(); bX.arc(s.x, s.y, s.r, 0, Math.PI * 2); bX.fill();
+            });
+
+            // Petals loop
+            pX.fillStyle = "#f9a8d4";
+            petals.forEach((p, i) => {
+                p.y += p.sp + (bass * 2); p.x += p.dr; p.ro += p.rs;
+                if (p.y > h + 20) petals[i] = createPetal();
+                pX.save(); pX.translate(p.x, p.y); pX.rotate(p.ro); pX.globalAlpha = 0.5;
+                pX.beginPath(); pX.ellipse(0, 0, p.sz, p.sz * 1.4, 0, 0, Math.PI * 2); pX.fill();
+                pX.restore();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- 2. 3D Carousel Logic (Optimized for Mobile/APK) ---
+        const carousel = document.getElementById('carousel');
+        const cards = document.querySelectorAll('.flip-card');
+        const dotsBox = document.getElementById('dots');
+        let RADIUS = 480;
+        const angleStep = 360 / cards.length;
+        let rotation = 0, isDragging = false, startX, startRot, hasDragged = false;
+
+        function updateRadius() {
+            // Smart Radius Calculation for small screens
+            const screenW = window.innerWidth;
+            if (screenW < 400) RADIUS = 320;
+            else if (screenW < 600) RADIUS = 380;
+            else if (screenW < 1000) RADIUS = 440;
+            else RADIUS = 480;
+
+            cards.forEach((card, i) => {
+                gsap.set(card, {
+                    rotationY: i * angleStep,
+                    transformOrigin: `50% 50% -${RADIUS}px`,
+                    z: RADIUS
+                });
+            });
+            gsap.set(carousel, { transformOrigin: `50% 50% -${RADIUS}px` });
+        }
+
+        // Init cards
+        cards.forEach((card, i) => {
+            const d = document.createElement('div');
+            d.className = 'dot' + (i === 0 ? ' active' : '');
+            dotsBox.appendChild(d);
+        });
+        updateRadius();
+        window.addEventListener('resize', updateRadius);
+
+        function updateUI() {
+            const index = (Math.round(-rotation / angleStep) % cards.length + cards.length) % cards.length;
+            document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
+        }
+
+        // Drag handlers
+        const onStart = (x) => { isDragging = true; startX = x; startRot = rotation; hasDragged = false; };
+        const onMove = (x) => {
+            if (!isDragging) return;
+            const delta = x - startX;
+            if (Math.abs(delta) > 5) hasDragged = true;
+            rotation = startRot + (delta * 0.2);
+            gsap.set(carousel, { rotationY: rotation });
+        };
+        const onEnd = () => {
+            if (!isDragging) return; isDragging = false;
+            // Snap to nearest card
+            const oldRot = Math.round(startRot / angleStep) * angleStep;
+            rotation = Math.round(rotation / angleStep) * angleStep;
+            gsap.to(carousel, { rotationY: rotation, duration: 0.8, ease: "power2.out", onUpdate: updateUI });
+            if (rotation !== oldRot) showEgyptianCheer(true);
+        };
+
+        window.addEventListener('mousedown', e => onStart(e.pageX));
+        window.addEventListener('mousemove', e => onMove(e.pageX));
+        window.addEventListener('mouseup', onEnd);
+        window.addEventListener('touchstart', e => onStart(e.touches[0].pageX), { passive: true });
+        window.addEventListener('touchmove', e => onMove(e.touches[0].pageX), { passive: true });
+        window.addEventListener('touchend', onEnd, { passive: true });
+
+        function navCarousel(dir) {
+            rotation += dir * angleStep;
+            gsap.to(carousel, { rotationY: rotation, duration: 0.8, ease: "power2.out", onUpdate: updateUI });
+            showEgyptianCheer(true);
+        }
+
+        // --- 3. Card Interactions ---
+        function handleCardClick(el) {
+            if (hasDragged) return;
+            el.classList.toggle('flipped');
+            if (el.classList.contains('flipped')) {
+                showEgyptianCheer(true);
+            }
+        }
+
+        // --- 4. Egyptian Toast Engine ---
+        const cheers = [
+            "الجمال ده محتاج ترخيص! 😉",
+            "ذوق ورُقيّ ملهوش زي! ✨",
+            "يا ست الكل، منورة الدنيا بطلتك! 🌟",
+            "شخصية تجبر الكل على احترامها.. 👏",
+            "إيه الشياكة دي؟ مفيّش كدة! ✨",
+            "قمر بصحيح.. الله أكبر عليكي! 🧿",
+            "المكان نور بوجودك يا مريم! ✦",
+            "ذوقك دايماً في حتة تانية خالص.. 🌟"
+        ];
+
+        function showEgyptianCheer(isTriggered = false) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'egy-toast';
+            toast.innerText = cheers[Math.floor(Math.random() * cheers.length)];
+
+            container.appendChild(toast);
+            twemoji.parse(toast, { folder: 'svg', ext: '.svg' }); 
+
+            setTimeout(() => {
+                toast.style.animation = 'toastExit 0.6s ease forwards';
+                setTimeout(() => toast.remove(), 600);
+            }, 3500);
+        }
+
+        // Ambient cheers
+        setInterval(() => {
+            if (Math.random() > 0.6) showEgyptianCheer();
+        }, 22000);
+
+        // --- 5. Utilities & Transitions ---
+        const audio = document.getElementById('bg-music');
+        function toggleAudio() {
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            
+            if (audio.paused) {
+                audio.play();
+                document.getElementById('a-icon').innerText = 'music_note';
+            } else {
+                audio.pause();
+                document.getElementById('a-icon').innerText = 'music_off';
+            }
+        }
+
+        function toggleScroll() {
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            if (audio.paused) {
+                audio.play().then(() => {
+                    document.getElementById('a-icon').innerText = 'music_note';
+                }).catch(() => {});
+            }
+
+            const overlay = document.getElementById('scroll-overlay');
+            const textEl = document.getElementById('scroll-text');
+            
+            // Wrap words in spans for animation if not already done
+            if (!textEl.innerHTML.includes('</span>')) {
+                const words = textEl.innerText.split(' ');
+                textEl.innerHTML = words.map(w => `<span>${w}</span>`).join(' ');
+            }
+
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+                gsap.to("#scroll-anim", { scaleY: 1, duration: 1.5, ease: "expo.out" });
+                
+                // Cinematic Staggered Reveal (Optimized)
+                gsap.to("#scroll-text span", { 
+                    opacity: 1, 
+                    y: 0, 
+                    duration: 0.8, 
+                    stagger: 0.05,
+                    delay: 0.5,
+                    ease: "power2.out",
+                    onComplete: () => twemoji.parse(textEl)
+                });
+            }, 10);
+        }
+
+        function closeScroll() {
+            gsap.to("#scroll-text span", { opacity: 0, y: -10, duration: 0.4, stagger: 0.02 });
+            gsap.to("#scroll-anim", { scaleY: 0, duration: 0.8, ease: "power2.in" });
+            const overlay = document.getElementById('scroll-overlay');
+            gsap.to(overlay, { opacity: 0, duration: 0.5, delay: 0.4, onComplete: () => overlay.style.display = 'none' });
+        }
+
+        window.addEventListener('load', () => {
+             // Cinematic Entrance Reveal
+             gsap.to("#portal-reveal", { 
+                clipPath: "circle(0% at 50% 50%)", 
+                duration: 1.5, 
+                ease: "expo.inOut", 
+                delay: 0.3,
+                onComplete: () => {
+                    document.getElementById('portal-reveal').remove();
+                    twemoji.parse(document.body, { folder: 'svg', ext: '.svg' });
+                    // Attempt auto-play
+                    const audio = document.getElementById('bg-music');
+                    if (audio) {
+                        audio.play().then(() => {
+                            initVisualizer();
+                        }).catch(() => {
+                            console.log("Autoplay blocked, waiting for touch.");
+                        });
+                        document.getElementById('a-icon').innerText = 'music_note';
+                    }
+                }
             });
         });
-    }
-    function closeScroll() {
-        gsap.to('#scroll-text span', { opacity:0, y:-8, duration:.32, stagger:.018 });
-        gsap.to('#scroll-anim',      { scaleY:0, duration:.65, ease:'power2.in' });
-        const ov = document.getElementById('scroll-overlay');
-        gsap.to(ov, { opacity:0, duration:.4, delay:.32, onComplete:()=>ov.style.display='none' });
-    }
 
-    /* LIGHTBOX */
-    cards.forEach(card => {
-        let pt;
-        card.addEventListener('touchstart', ()=>{ pt=setTimeout(()=>openLB(card.querySelector('img').src),650); }, {passive:true});
-        ['touchend','touchmove'].forEach(ev => card.addEventListener(ev,()=>clearTimeout(pt),{passive:true}));
-        card.addEventListener('contextmenu', e=>{ e.preventDefault(); openLB(card.querySelector('img').src); });
-    });
-    function openLB(src) {
-        const lb = document.getElementById('lightbox');
-        document.getElementById('lb-img').src = src;
-        lb.style.display='flex';
-        requestAnimationFrame(()=>lb.classList.add('visible'));
-    }
-    function closeLB() {
-        const lb = document.getElementById('lightbox');
-        lb.classList.remove('visible');
-        setTimeout(()=>lb.style.display='none', 360);
-    }
-
-    /* FIRST INTERACTION — unlocks audio in WebView */
-    function onFirstTouch() {
-        initVisualizer();
-        if (audioCtx && audioCtx.state==='suspended') audioCtx.resume();
-        if (audioEl && audioEl.paused)
-            audioEl.play().then(()=>document.getElementById('a-icon').innerText='music_note').catch(()=>{});
-        window.removeEventListener('click',      onFirstTouch);
-        window.removeEventListener('touchstart', onFirstTouch);
-    }
-    window.addEventListener('click',      onFirstTouch);
-    window.addEventListener('touchstart', onFirstTouch, {passive:true});
-
-    /* ═══════════════════════════════════════════════════════════
-       ENTRY — order is critical
-    ═══════════════════════════════════════════════════════════ */
-    window.addEventListener('load', () => {
-        syncVH();            // 1. true viewport height
-        resizeCanvas();      // 2. size canvases
-        updateCarouselRadius(); // 3. 3D layout
-        fitScene();          // 4. scale to fit
-
-        audioEl.play()
-            .then(()=>{ initVisualizer(); document.getElementById('a-icon').innerText='music_note'; })
-            .catch(()=>{});
-
-        gsap.to('#portal-reveal', {
-            clipPath:'circle(0% at 50% 50%)',
-            duration:1.4, ease:'expo.inOut', delay:.25,
-            onComplete:() => {
-                const pr = document.getElementById('portal-reveal');
-                if (pr) pr.remove();
-                safeTwemoji(document.body);
+        // Global interaction listener to establish Audio Graph early
+        function handleFirstInteraction() {
+            initVisualizer();
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            
+            // Critical Fix: Explicitly play if paused (handles user first interaction properly)
+            const music = document.getElementById('bg-music');
+            if (music && music.paused) {
+                music.play().then(() => {
+                    document.getElementById('a-icon').innerText = 'music_note';
+                }).catch(e => console.log("Play failed: ", e));
             }
+
+            window.removeEventListener('click', handleFirstInteraction);
+            window.removeEventListener('touchstart', handleFirstInteraction);
+        }
+        window.addEventListener('click', handleFirstInteraction);
+        window.addEventListener('touchstart', handleFirstInteraction);
+
+        // Double click/Long press for Lightbox
+        cards.forEach(card => {
+            card.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                openLB(card.querySelector('img').src);
+            });
         });
-    });
+
+        function openLB(src) {
+            const lb = document.getElementById('lightbox');
+            document.getElementById('lb-img').src = src;
+            lb.style.display = 'flex';
+            setTimeout(() => lb.classList.add('visible'), 10);
+        }
+        function closeLB() {
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('visible');
+            setTimeout(() => lb.style.display = 'none', 400);
+        }
     </script>
 </body>
+
 </html>
